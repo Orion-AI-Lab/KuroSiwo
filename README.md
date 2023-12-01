@@ -1,5 +1,6 @@
 # [Kuro Siwo: A global multi-temporal SAR dataset for rapid flood mapping](https://arxiv.org/abs/2311.12056) 
 
+![Kuro Siwo](imgs/kuro_spatial.png)
 ### Download Kuro Siwo
 - The Kuro Siwo Dataset can be downloaded either from the following [link](https://www.dropbox.com/scl/fo/nkqaa9se5zl3yng4bdai4/h?rlkey=bro222cvgu4lo3b4towo6gbmm&dl=0) or by executing:
 

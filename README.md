@@ -12,6 +12,8 @@
     1. Make sure to grant the necessary rights by executing `chmod +x download_kuro_siwo.sh`
     2. Execute `./download_kuro_siwo.sh DESIRED_DATASET_ROOT_PATH` e.g: `./download_kuro_siwo.sh .`
    
+
+### Citation
 If you use this work please cite:
 ```
 @article{bountos2023kuro,

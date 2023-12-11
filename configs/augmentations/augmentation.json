@@ -1,0 +1,48 @@
+{
+    "augmentations": {
+        "RandomResizedCrop": {
+            "value": 224,
+            "scale":[0.2, 1.0],
+            "interpolation":3,
+            "p": 1.0
+        },
+        "GaussianBlur": {
+            "sigma_limit": [
+                0.1,
+                2.0
+            ],
+            "p": 0.0
+        },
+        "HorizontalFlip": {
+            "p": 0.5
+        },
+        "VerticalFlip": {
+            "p": 0.0
+        },
+        "ElasticTransform": {
+            "alpha": "1.0",
+            "sigma": 50,
+            "alpha_affine": 50,
+            "interpolation": 1,
+            "border_mode": 4,
+            "value": null,
+            "mask_value": null,
+            "same_dxdy": false,
+            "approximate": true,
+            "p": 0.0
+        },
+        "MultNoise": {
+            "p": 0.0
+        },
+        "ColorJitter": {
+            "brightness": 0.2,
+            "contrast": 0.2,
+            "saturation": 0.2,
+            "hue": 0.2,
+            "p": 0.0
+        },
+        "Cutout": {
+            "p": 0.0
+        }
+    }
+}

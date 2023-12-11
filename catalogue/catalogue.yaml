@@ -1,0 +1,362 @@
+---
+App: IFLOODS
+UUID: '77f76c20-9a46-42b7-9584-22cf00bd0810'
+Description: Kuro Siwo Dataset
+Version: 0.1
+
+DATA_PATH: &DATA_PATH your/path/to/data
+CAT_PATH: &CAT_PATH !join [*DATA_PATH, 'catalogue.gpkg']
+REPO_PATH: &REPO_PATH !join [*DATA_PATH, 'data']
+PICKLE_PATH: pickle/grid_dict.pkl
+
+DEVEL: True
+
+CRS: 3857
+
+CL_ZONES:
+  - cl_zone: 1
+    cl_name: Tropical
+  - cl_zone: 2
+    cl_name: Arid
+  - cl_zone: 3
+    cl_name: Temperate
+  - cl_zone: 4
+    cl_name: Cold
+  - cl_zone: 5
+    cl_name: Polar
+
+Floods:
+  - act_id: 470
+    act_region: Togo
+    ref_date: 20201005T180000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Oti River
+        cl_zone: 1
+  - act_id: 445
+    act_region: Romania
+    ref_date: 20200626T080000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Prut
+        cl_zone: 2
+  - act_id: 437
+    act_region: France
+    ref_date: 20200510T220000
+    aois:
+      - aoi_id: '07'
+        aoi_name: Cazaubin
+        cl_zone: 3
+  - act_id: 427
+    act_region: Sweden
+    ref_date: 20200218T120000
+    aois:
+      - aoi_id: '03'
+        aoi_name: Skaraborg
+        cl_zone: 3
+      - aoi_id: '04'
+        aoi_name: Goteborg
+        cl_zone: 3
+      - aoi_id: '07'
+        aoi_name: Kristianstad
+        cl_zone: 3
+      - aoi_id: '09'
+        aoi_name: Vetlanda
+        cl_zone: 3
+      - aoi_id: '10'
+        aoi_name: Liatorp
+        cl_zone: 3
+  - act_id: 520
+    act_region: Netherlands
+    ref_date: 20210716T000000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Area1
+        cl_zone: 3
+  - act_id: 518
+    act_region: Belgium
+    ref_date: 20210714T200000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Liege
+        cl_zone: 3
+      - aoi_id: '02'
+        aoi_name: Rochefort
+        cl_zone: 3
+  - act_id: 514
+    act_region: Guyana
+    ref_date: 20210606T130000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Pomeroon River
+        cl_zone: 1
+      - aoi_id: '02'
+        aoi_name: Upper Cuyuni
+        cl_zone: 1
+      - aoi_id: '03'
+        aoi_name: Upper Mazaruni
+        cl_zone: 1
+  - act_id: 502
+    act_region: Ireland
+    ref_date: 20210223T040000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Clonmel
+        cl_zone: 3
+      - aoi_id: '02'
+        aoi_name: Mallow
+        cl_zone: 3
+      - aoi_id: '03'
+        aoi_name: Fermoy
+        cl_zone: 3
+      - aoi_id: '04'
+        aoi_name: Killarney
+        cl_zone: 3
+      - aoi_id: '05'
+        aoi_name: Cork
+        cl_zone: 3
+      - aoi_id: '07'
+        aoi_name: Bandon
+        cl_zone: 3
+  - act_id: 498
+    act_region: France
+    ref_date: 20210202T000000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Area1
+        cl_zone: 3
+  - act_id: 497
+    act_region: Germany
+    ref_date: 20210201T120000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Area1
+        cl_zone: 3
+  - act_id: 496
+    act_region: Italy
+    ref_date: 20210126T060000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Area1
+        cl_zone: 3
+  - act_id: 492
+    act_region: France
+    ref_date: 20210101T120000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Area1
+        cl_zone: 3
+  - act_id: 118
+    act_region: Spain
+    ref_date: 20150202T000000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Zaragoza
+        cl_zone: 2
+      - aoi_id: '02'
+        aoi_name: Trespaderne
+        cl_zone: 3
+  - act_id: 130
+    act_region: Myanmar
+    ref_date: 20150801T063000
+    aois:
+      - aoi_id: '06'
+        aoi_name: Pathein
+        cl_zone: 1
+  - act_id: 147
+    act_region: Cumbria
+    ref_date: 20151205T120000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Carlisle
+        cl_zone: 3
+      - aoi_id: '02'
+        aoi_name: Cockermouth
+        cl_zone: 3
+      - aoi_id: '03'
+        aoi_name: Appleby
+        cl_zone: 3
+  - act_id: 174
+    act_region: Skopje
+    ref_date: 20160806T010000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Skopje
+        cl_zone: 2
+  - act_id: 205
+    act_region: SriLanka
+    ref_date: 20170524T183000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Beruwala
+        cl_zone: 1
+      - aoi_id: '03'
+        aoi_name: Kuruwita
+        cl_zone: 1
+      - aoi_id: '04'
+        aoi_name: Kiriella
+        cl_zone: 1
+      - aoi_id: '05'
+        aoi_name: Rathnapura
+        cl_zone: 1
+  - act_id: 267
+    act_region: Lithuania
+    ref_date: 20180131T010000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Rusne
+        cl_zone: 3
+  - act_id: 273
+    act_region: Albania
+    ref_date: 20180310T010000
+    aois:
+      - aoi_id: '02'
+        aoi_name: Dajc
+        cl_zone: 3
+      - aoi_id: '03'
+        aoi_name: Scutari
+        cl_zone: 3
+      - aoi_id: '04'
+        aoi_name: Gomsiqe
+        cl_zone: 3
+      - aoi_id: '05'
+        aoi_name: Barbullush
+        cl_zone: 3
+  - act_id: 275
+    act_region: Croatia
+    ref_date: 20180321T010000
+    aois:
+      - aoi_id: '01'
+        aoi_name: LijeviDubrovcak
+        cl_zone: 3
+      - aoi_id: '02'
+        aoi_name: Kutina
+        cl_zone: 3
+      - aoi_id: '03'
+        aoi_name: Novska
+        cl_zone: 3
+  - act_id: 277
+    act_region: Greece
+    ref_date: 20180327T150000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Orestiada
+        cl_zone: 2
+      - aoi_id: '02'
+        aoi_name: Didimoticho
+        cl_zone: 3
+      - aoi_id: '03'
+        aoi_name: Feres
+        cl_zone: 3
+  - act_id: 279
+    act_region: Spain
+    ref_date: 20180412T110000
+    aois:
+      - aoi_id: '05'
+        aoi_name: Zaragoza
+        cl_zone: 2
+      - aoi_id: '06'
+        aoi_name: Caspe
+        cl_zone: 2
+      - aoi_id: '11'
+        aoi_name: Tortosa
+        cl_zone: 2
+  - act_id: 321
+    act_region: Honduras
+    ref_date: 20181006T030000
+    aois:
+      - aoi_id: '01'
+        aoi_name: San Lorenzo
+        cl_zone: 1
+      - aoi_id: '02'
+        aoi_name: Choluteca
+        cl_zone: 1
+      - aoi_id: '03'
+        aoi_name: Somotillo
+        cl_zone: 1
+      - aoi_id: '04'
+        aoi_name: Mojaras
+        cl_zone: 1
+  - act_id: 324
+    act_region: France
+    ref_date: 20181015T040000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Carcassonne
+        cl_zone: 3
+      - aoi_id: '02'
+        aoi_name: Puicheric
+        cl_zone: 2
+      - aoi_id: '03'
+        aoi_name: Moussan
+        cl_zone: 2
+      - aoi_id: '04'
+        aoi_name: Lespignan
+        cl_zone: 2
+  - act_id: 411
+    act_region: France
+    ref_date: 20191123T203000
+    aois:
+      - aoi_id: '01'
+        aoi_name: PugetSurArgens
+        cl_zone: 3
+  - act_id: 417
+    act_region: Portugal
+    ref_date: 20191219T010000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Coimbra
+        cl_zone: 3
+  - act_id: 421
+    act_region: France
+    ref_date: 20200122T183000
+    aois:
+      - aoi_id: '05'
+        aoi_name: Rivesaltes
+        cl_zone: 2
+  - act_id: 554
+    act_region: Australia
+    ref_date: 20211130T180000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Inglewood
+        cl_zone: 2
+  - act_id: 555
+    act_region: Spain
+    ref_date: 20211210T110000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Ebro
+        cl_zone: 2
+  - act_id: 559
+    act_region: Madagascar
+    ref_date: 20220125T000000
+    aois:
+      - aoi_id: '04'
+        aoi_name: Moramanga
+        cl_zone: 1
+  - act_id: 561
+    act_region: Malawi
+    ref_date: 20220124T120000
+    aois:
+      - aoi_id: '01'
+        aoi_name: Chikwawa
+        cl_zone: 2
+  - act_id: 562
+    act_region: Australia
+    ref_date: 20220129T070000
+    aois:
+      - aoi_id: '13'
+        aoi_name: Burketown
+        cl_zone: 2
+  - act_id: 567
+    act_region: Australia
+    ref_date: 20220226T080000
+    aois:
+      - aoi_id: '08'
+        aoi_name: Grafton
+        cl_zone: 3
+      - aoi_id: '15'
+        aoi_name: Singleton
+        cl_zone: 3
+...

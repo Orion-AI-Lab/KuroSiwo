@@ -1,0 +1,18 @@
+{
+    "image_size":224,
+    "patch_size":16,
+    "num_classes":1000,
+    "dim":1024,
+    "depth":24,
+    "heads":16,
+    "mlp_dim":2048,
+    "masked_ratio":0.75,
+    "decoder_dim":512, 
+    "decoder_depth":8,
+    "decoder_heads":16,
+    "num_samples_per_epoch":700000, 
+    "accumulate_gradients":4,
+    "warmup_epochs":10,
+    "learning_rate":1e-5,
+    "min_lr":0
+}

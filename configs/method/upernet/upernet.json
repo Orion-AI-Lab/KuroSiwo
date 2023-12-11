@@ -1,0 +1,11 @@
+{
+    "method": "upernet",
+    "optimizer": "adam",
+    "learning_rate": 0.0001,
+    "weight_decay": 1e-4,
+    "lr_schedule": null,
+    "architecture": "UperNet",
+    "backbone": "convnext_tiny",
+    "pretrained": true,
+    "encoder_weights": "imagenet"
+}

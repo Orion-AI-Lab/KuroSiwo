@@ -1,0 +1,16 @@
+{
+  "task": "segmentation", // method category, options: segmentation, change detection, mae (Masked Autoencoder)
+  "root_path":"KuroSiwo/", //your data root path
+  "wandb_project": "Your_Project",
+  "wandb_entity": "your_entity",
+  "wandb_id": "None",
+  "resume_wandb": false,
+  "wandb_activate": false,
+  "log_AOI_metrics": true, // Log metrics for each AOI
+  "log_zone_metrics": false, // Log metrics for each climate zone
+  "method": "unet", // architecture choice e.g UNet, UPerNet, etc.
+  "gpu": 0, // GPU ID, null for CPU
+  "mixed_precision": true,
+  "num_classes": 3,
+  "test":false, // test mode
+}

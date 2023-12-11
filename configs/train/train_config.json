@@ -1,0 +1,14 @@
+{
+    "batch_size": 128,
+    "epochs": 1,
+    "num_workers": 8,
+    "start_epoch": 0,
+    "print_frequency": 10,
+    "on_screen_prints": false,
+    "train_save_checkpoint_freq": 1,
+    "weighted": false,
+    "resume_checkpoint": false,
+    "loss_function": "cross_entropy",
+    "oversampling":false,
+    "evaluate_water":true
+}

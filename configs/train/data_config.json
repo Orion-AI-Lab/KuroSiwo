@@ -1,0 +1,22 @@
+{
+  "track": "RandomEvents",
+  "train_pickle": "pickle/grid_dict.pkl",
+  "test_pickle": "pickle/grid_dict.pkl",
+  "negative_pickle":"pickle/negatives_only.pkl",
+  "inputs": ["pre_event_1","pre_event_2", "post_event"],
+  "channels": [ "vv","vh"],
+  "water_percentage": "[0,100]",
+  "data_augmentations":false,
+  "clamp_input": 0.15,
+  "scale_input": "normalize",
+  "data_mean": [0.0953, 0.0264],
+  "data_std": [0.0427, 0.0215],
+  "dem_mean":67.0293,
+  "dem_std":1765.0062,
+  "dem":false,
+  "slope":false,
+  "slope_mean":2.9482,
+  "slope_std":79.2493,
+  "reverse_scaling":false,
+  "uint8":false
+}

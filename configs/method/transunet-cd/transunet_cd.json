@@ -1,0 +1,14 @@
+{
+  "method": "transunet-cd",
+  "optimizer": "adamw",
+  "learning_rate": 6e-5,
+  "weight_decay": 0.01,
+  "betas":[0.9, 0.009],
+  "lr_schedule": "linear",
+  "siamese": false,
+  "out_channels": 128,
+  "head_num": 4,
+  "mlp_dim": 512,
+  "block_num": 8,
+  "patch_dim": 16
+}

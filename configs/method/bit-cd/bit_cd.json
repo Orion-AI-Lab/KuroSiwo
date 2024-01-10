@@ -1,0 +1,11 @@
+{
+  "method": "bit-cd",
+  "net_G": "base_resnet18",
+  "optimizer": "sgd",
+  "learning_rate": 1e-5,
+  "momentum": 0.9,
+  "weight_decay": 5e-4,
+  "lr_schedule": null,
+  "init_type": "normal",
+  "init_gain": 0.02
+}

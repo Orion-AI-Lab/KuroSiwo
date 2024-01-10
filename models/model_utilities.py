@@ -7,13 +7,14 @@ import torch.nn as nn
 from denoising_diffusion_pytorch import GaussianDiffusion, Unet
 
 import models.upernet as upernet
-import segmentation_models_siamese_pytorch as smsp
 
+from .adhr_cdnet import ADHR
 from .bit_cd import define_G
 from .changeformer import ChangeFormerV6
 from .hfanet import HFANet
 from .siam_conc import SiamUnet_conc
 from .siam_diff import SiamUnet_diff
+from .snunet import SNUNet_ECAM 
 
 
 class Decoder(nn.Module):
@@ -173,83 +174,8 @@ def initialize_cd_model(configs, model_configs, phase="train"):
         model = SiamUnet_diff(
             input_nbr=len(configs["channels"]), label_nbr=configs["num_classes"]
         )
-    elif configs["method"].lower() == "stanet":
-        from .stanet import create_model
-
-        if configs["resume_checkpoint"]:
-            ckpt = Path(configs["resume_checkpoint"])
-            if "best_segmentation" == ckpt.stem:
-                with open(ckpt.parent / "best_segmentation.txt", "r") as f:
-                    epoch = int(f.readline().strip())
-            else:
-                epoch = int(ckpt.stem.split("=")[1])
-        else:
-            ckpt = None
-            epoch = 0
-
-        opts = {
-            # 'encoder_name': model_configs['encoder_name'],
-            "pretrained": model_configs["pretrained"],
-            # 'activation': model_configs['activation'],
-            "in_channels": len(configs["channels"]),
-            "num_classes": configs["num_classes"],
-            "lr_policy": model_configs["lr_policy"],
-            "lr_decay": model_configs["lr_decay"],
-            "lr_decay_iters": model_configs["lr_decay_iters"],
-            "epoch_count": configs["epochs"],
-            "niter": model_configs["niter"],
-            "niter_decay": model_configs["niter_decay"],
-            "gpu_ids": [configs["gpu"]],
-            "isTrain": (phase == "train"),
-            "checkpoints_dir": configs["checkpoint_path"],
-            "name": "STANet",
-            "phase": phase,
-            "continue_train": configs["resume_checkpoint"],
-            "load_iter": ckpt,
-            "verbose": True,
-            "epoch": epoch,
-            "model": model_configs["model"],
-            "istest": (phase != "train"),
-            "f_c": model_configs["f_c"],
-            "arch": model_configs["arch"],
-            "lr": model_configs["lr"],
-            "beta1": model_configs["beta1"],
-            "ds": model_configs["ds"],
-            "SA_mode": model_configs["sa_mode"],
-            "device": configs["device"],
-        }
-
-        model = create_model(opts)
     elif configs["method"].lower() == "bit-cd":
         model = define_G(model_configs, in_channels=len(configs["channels"]))
-    elif configs["method"].lower() == "unet-siam-conc":
-        model = smsp.Unet(
-            encoder_name=model_configs[
-                "backbone"
-            ],  # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
-            encoder_weights=model_configs[
-                "encoder_weights"
-            ],  # use `imagenet` pre-trained weights for encoder initialization
-            in_channels=len(configs["channels"]),
-            classes=configs[
-                "num_classes"
-            ],  # model output channels (number of classes in your dataset)
-            fusion_mode="conc",
-        )
-    elif configs["method"].lower() == "unet-siam-diff":
-        model = smsp.Unet(
-            encoder_name=model_configs[
-                "backbone"
-            ],  # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
-            encoder_weights=model_configs[
-                "encoder_weights"
-            ],  # use `imagenet` pre-trained weights for encoder initialization
-            in_channels=len(configs["channels"]),
-            classes=configs[
-                "num_classes"
-            ],  # model output channels (number of classes in your dataset)
-            fusion_mode="diff",
-        )
     elif configs["method"].lower() == "hfa-net":
         model = HFANet(
             input_channel=len(configs["channels"]),
@@ -263,13 +189,33 @@ def initialize_cd_model(configs, model_configs, phase="train"):
             output_nc=configs["num_classes"],
             decoder_softmax=model_configs["decoder_softmax"],
         )
+    elif configs['method'].lower() == 'snunet':
+        model = SNUNet_ECAM(
+            configs['num_channels'],
+            configs['num_classes'],
+            base_channel=model_configs['base_channel']
+        )
+    elif configs['method'].lower() == 'adhr-cdnet':
+        model = ADHR(
+            in_channels=configs['num_channels'],
+            num_classes=configs['num_classes']
+        )
+    elif configs['method'].lower() == 'transunet-cd':
+        model = TransUNet_CD(
+            img_dim=224,
+            in_channels=configs['num_channels'],
+            out_channels=configs['out_channels'],
+            head_num=configs['head_num'],
+            mlp_dim=configs['mlp_dim'],
+            block_num=configs['block_num'],
+            patch_dim=configs['patch_dim'],
+            class_num=configs['num_classes'],
+            siamese=configs['siamese']
+        )
 
     if configs["resume_checkpoint"]:
-        if configs["method"].lower() == "stanet":
-            model.load_networks(epoch=epoch)
-        else:
-            checkpoint = torch.load(configs["resume_checkpoint"])
-            model.load_state_dict(checkpoint["model_state_dict"])
+        checkpoint = torch.load(configs["resume_checkpoint"])
+        model.load_state_dict(checkpoint["model_state_dict"])
 
     print(model)
     return model

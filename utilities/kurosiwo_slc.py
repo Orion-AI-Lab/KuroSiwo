@@ -17,6 +17,9 @@ from shapely.geometry import Polygon, box
 from tqdm import tqdm
 import time
 
+ASF_USERNAME = 'YOUR ALASKA FOUNDATION USERNAME'
+ASF_PASSWORD = 'YOUR ALASKA FOUNDATION PASSWORD'
+
 def download_from_asf(geometry,start,end,storage_path='slc_data/'):
     print('Searching for polygon: ',geometry, '\nFrom: ',start,' till: ',end)
     opts = {
@@ -34,7 +37,7 @@ def download_from_asf(geometry,start,end,storage_path='slc_data/'):
         print('Product already downloaded. Skipping download.')
         return write_path, folder
     print('Downloading product: ',info['properties']['fileName'])
-    session = asf.ASFSession().auth_with_creds('ngearth', 'shQradFCJ2j93DB')
+    session = asf.ASFSession().auth_with_creds(ASF_USERNAME, ASF_PASSWORD)
     results.download(path=storage_path, session=session)   
     return write_path,  folder
 

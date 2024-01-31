@@ -1,0 +1,13 @@
+{
+  "method": "changeformer",
+  "optimizer": "adamw",
+  "learning_rate": 6e-5,
+  "weight_decay": 0.01,
+  "betas":[0.9, 0.009],
+  "lr_schedule": "linear",
+  "embed_dim": 256,
+  "multi_scale_train": false,
+  "multi_scale_infer": false,
+  "multi_pred_weights": [0.5, 0.5, 0.5, 0.8, 1.0],
+  "decoder_softmax": true
+}

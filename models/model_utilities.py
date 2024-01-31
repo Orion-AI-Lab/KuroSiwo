@@ -1,20 +1,20 @@
 from pathlib import Path
 
 import einops
-import segmentation_models_pytorch as smp
+#import segmentation_models_pytorch as smp
 import torch
 import torch.nn as nn
 from denoising_diffusion_pytorch import GaussianDiffusion, Unet
 
 import models.upernet as upernet
-import segmentation_models_siamese_pytorch as smsp
+#import segmentation_models_siamese_pytorch as smsp
 
 from .bit_cd import define_G
 from .changeformer import ChangeFormerV6
 from .hfanet import HFANet
 from .siam_conc import SiamUnet_conc
 from .siam_diff import SiamUnet_diff
-
+import segmentation_models_pytorch as smp
 
 class Decoder(nn.Module):
     def __init__(self, input_size, output_channels):

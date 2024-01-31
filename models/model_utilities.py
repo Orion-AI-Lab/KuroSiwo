@@ -15,6 +15,7 @@ from .hfanet import HFANet
 from .siam_conc import SiamUnet_conc
 from .siam_diff import SiamUnet_diff
 from .snunet import SNUNet_ECAM 
+import segmentation_models_pytorch as smp
 
 
 class Decoder(nn.Module):

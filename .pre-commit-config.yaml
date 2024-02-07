@@ -4,6 +4,7 @@ repos:
     rev: 23.11.0
     hooks:
       - id: black
+        args: [-l, "123"]
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see

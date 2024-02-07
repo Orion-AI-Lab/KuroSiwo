@@ -46,5 +46,5 @@ and execute `pre-commit install`.
 
 #### Pretrained models
 The weights of the top performing models can be accessed using the following links:
-  - [FloodViT](https://www.dropbox.com/scl/fi/znrq7tsiui2w4auyzrjcr/best_segmentation.pt?rlkey=vp1x23xx7qca1eghu3h650udm&dl=0)
+  - [FloodViT](https://www.dropbox.com/scl/fi/srw7u4cw1gtxrf4xzmsh7/floodvit.pt?rlkey=snskpq1qrdav5u2jya8k2bocg&dl=0)
   - [SNUNet](https://www.dropbox.com/scl/fi/3vlsveoobqe1wc71s5z2d/best_segmentation.pt?rlkey=xpy2thmozzxfzymr8b13m7n51&dl=0)

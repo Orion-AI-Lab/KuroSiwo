@@ -6,8 +6,7 @@ import pyjson5 as json
 import torch
 import wandb
 from tqdm import tqdm
-from vit_pytorch.vit import ViT
-
+from models.vision_transformer import ViT
 import dataset.Dataset as Dataset
 from models import mae as mae_model
 

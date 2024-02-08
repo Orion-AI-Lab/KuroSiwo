@@ -100,16 +100,26 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
             for index, batch in enumerate(train_loader):
 
                 if configs['scale_input'] is not None:
-                    post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
-                    pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, clz, activ = batch
+                    if configs['dem']:
+                        post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
+                        pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, dem, clz, activ = batch
+                    else:
+                        post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
+                        pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, clz, activ = batch
                 else:
-                    post_event, mask, pre_event_1, pre_event_2, clz, activ = batch
+                    if configs['dem']:
+                        post_event, mask, pre_event_1, pre_event_2, dem, clz, activ = batch
+                    else:
+                        post_event, mask, pre_event_1, pre_event_2, clz, activ = batch
 
                 with torch.cuda.amp.autocast(enabled=configs['mixed_precision']):
                     pre_event_1 = pre_event_1.to(configs['device'])
                     pre_event_2 = pre_event_2.to(configs['device'])
                     post_event = post_event.to(configs['device'])
                     mask = mask.to(configs['device'])
+
+                    if configs['dem']:
+                        dem = dem.to(device)
 
                     if configs['method'] == 'stanet':
                         total_iters += configs['batch_size']
@@ -137,11 +147,20 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                         inputs = []
                         for inp in configs['inputs']:
                             if inp == 'pre_event_1':
-                                inputs.append(pre_event_1)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((pre_event_1, dem), dim=1))
+                                else:
+                                    inputs.append(pre_event_1)
                             elif inp == 'pre_event_2':
-                                inputs.append(pre_event_2)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((pre_event_2, dem), dim=1))
+                                else:
+                                    inputs.append(pre_event_2)
                             elif inp == 'post_event':
-                                inputs.append(post_event)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((post_event, dem), dim=1))
+                                else:
+                                    inputs.append(post_event)
 
                         optimizer.zero_grad()
                         output = model(*inputs)
@@ -403,15 +422,25 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
             with torch.cuda.amp.autocast(enabled=configs['mixed_precision']):
                 with torch.no_grad():
                     if configs['scale_input'] is not None:
-                        post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
-                        pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, clz, activ = batch
+                        if configs['dem']:
+                            post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
+                            pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, dem, clz, activ = batch
+                        else:
+                            post_scale_var_1, post_scale_var_2, post_event, mask, pre1_scale_var_1, \
+                            pre1_scale_var_2, pre_event_1, pre2_scale_var_1, pre2_scale_var_2, pre_event_2, clz, activ = batch
                     else:
-                        post_event, mask, pre_event_1, pre_event_2, clz, activ = batch
+                        if configs['dem']:
+                            post_event, mask, pre_event_1, pre_event_2, dem, clz, activ = batch
+                        else:
+                            post_event, mask, pre_event_1, pre_event_2, clz, activ = batch
 
                     pre_event_1 = pre_event_1.to(configs['device'])
                     pre_event_2 = pre_event_2.to(configs['device'])
                     post_event = post_event.to(configs['device'])
                     mask = mask.to(configs['device'])
+
+                    if configs['dem']:
+                        dem = dem.to(device)
 
                     if configs['method'] == 'stanet':
                         total_iters += configs['batch_size']
@@ -441,11 +470,20 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
                         inputs = []
                         for inp in configs['inputs']:
                             if inp == 'pre_event_1':
-                                inputs.append(pre_event_1)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((pre_event_1, dem), dim=1))
+                                else:
+                                    inputs.append(pre_event_1)
                             elif inp == 'pre_event_2':
-                                inputs.append(pre_event_2)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((pre_event_2, dem), dim=1))
+                                else:
+                                    inputs.append(pre_event_2)
                             elif inp == 'post_event':
-                                inputs.append(post_event)
+                                if configs['dem']:
+                                    inputs.append(torch.cat((post_event, dem), dim=1))
+                                else:
+                                    inputs.append(post_event)
 
                         output = model(*inputs)
 

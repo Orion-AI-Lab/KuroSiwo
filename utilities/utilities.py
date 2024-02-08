@@ -374,10 +374,16 @@ def update_config(config, args=None):
             config.update(configs_distr)
 
     # Compute total number of input channels
-    config["num_channels"] = len(config["channels"]) * len(config["inputs"])
-
-    if config["dem"]:
-        config["num_channels"] += 1
+    if config['task'] == 'cd':
+        config['num_channels'] = len(config['channels'])
+        if config['permanent_water_mask']:
+            config['num_channels'] += 1
+        if config['dem']:
+            config['num_channels'] += 1
+    else:
+        config['num_channels'] = len(config['channels']) * len(config['inputs'])
+        if config['dem']:
+            config['num_channels'] += 1
 
     if config["weighted"] and config["track"] == "RandomEvents":
         config["class_weights"] = [

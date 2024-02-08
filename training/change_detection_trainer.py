@@ -377,6 +377,9 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
 def eval_change_detection(model, loader, settype, configs=None, model_configs=None):
     accuracy, fscore, precision, recall, iou = initialize_metrics(configs, mode='val')
 
+    if configs['evaluate_water']:
+        water_fscore = F1Score(task='multiclass', num_classes=2, average='none', multidim_average='global', ignore_index=3).to(configs['device'])
+
     if configs['log_zone_metrics']:
         accuracy_clzone1, fscore_clzone1, precision_clzone1, recall_clzone1, iou_clzone1 = initialize_metrics(configs, mode='val')
         accuracy_clzone2, fscore_clzone2, precision_clzone2, recall_clzone2, iou_clzone2 = initialize_metrics(configs, mode='val')
@@ -464,6 +467,13 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
                     precision(predictions, mask)
                     recall(predictions, mask)
                     iou(predictions, mask)
+
+                    if configs['evaluate_water']:
+                        water_only_predictions = predictions.clone()
+                        water_only_predictions[water_only_predictions == 2] = 1
+                        water_only_labels = mask.clone()
+                        water_only_labels[water_only_labels == 2] = 1
+                        water_fscore(water_only_predictions, water_only_labels)
 
                     if index % configs['print_frequency'] == 0:
                         pbar.set_description(f'{settype} Loss: {total_loss:.4f}')
@@ -578,6 +588,9 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
     ious = iou.compute()
     mean_iou = ious[:3].mean()
 
+    if configs['evaluate_water']:
+        water_total_fscore = water_fscore.compute()
+
     if configs['log_zone_metrics']:
         acc_clz1 = accuracy_clzone1.compute()
         score_clz1 = fscore_clzone1.compute()
@@ -630,6 +643,9 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
         print(f'{settype} IoU ({CLASS_LABELS[1]}): {100 * ious[1].item()}')
         print(f'{settype} IoU ({CLASS_LABELS[2]}): {100 * ious[2].item()}')
         print(f'{settype} MeanIoU: {mean_iou * 100}')
+
+        if configs['evaluate_water']:
+            print(f'{settype} F-Score (Only water): {100 * water_total_fscore[1].item()}')
 
         print(f'\n{"="*20}')
 
@@ -748,6 +764,9 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
             f'{settype} IoU ({CLASS_LABELS[1]})': 100 * ious[1].item(),
             f'{settype} IoU ({CLASS_LABELS[2]})': 100 * ious[2].item(),
             f'{settype} MeanIoU': mean_iou * 100}
+
+        if configs['evaluate_water']:
+            log_dict.update({f'{settype} F-Score (Only water)': 100 * water_total_fscore[1].item()})
 
         if configs['log_zone_metrics']:
             log_dict.update({

@@ -295,7 +295,7 @@ def init_lr_scheduler(optimizer, configs, model_configs, model_name=None, steps=
         )
 
     # Load checkpoint (if any)
-    if configs["resume_checkpoint"] and (configs["method"] != "stanet"):
+    if configs["resume_checkpoint"]:
         checkpoint = torch.load(configs["resume_checkpoint"])
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler_state_dict"])
 

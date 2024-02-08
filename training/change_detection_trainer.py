@@ -27,10 +27,7 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
             json.dump({'run_id': id}, open(configs['checkpoint_path'] + '/id.json', 'w'))
 
         wandb.init(project=configs['wandb_project'], entity=configs['wandb_entity'], config=configs, id=id, resume="allow")
-        if configs['method'] == 'stanet':
-            wandb.watch(model.netF, log_freq=20)
-        else:
-            wandb.watch(model, log_freq=20)
+        wandb.watch(model, log_freq=20)
 
     # Initialize metrics
     accuracy, fscore, precision, recall, iou = initialize_metrics(configs)
@@ -38,11 +35,10 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
     if configs['log_AOI_metrics']:
         activ_metrics = {activ: initialize_metrics(configs, mode='val') for activ in train_loader.dataset.activations}
 
-    if configs['method'] != 'stanet':
-        model.to(configs['device'])
+    model.to(configs['device'])
 
-        # Initialize loss
-        criterion = create_loss(configs, mode='train')
+    # Initialize loss
+    criterion = create_loss(configs, mode='train')
 
     # Initialize optimizer
     if configs['method'] in ['bit-cd', 'hfa-net']:
@@ -51,7 +47,7 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
             lr=model_configs['learning_rate'],
             momentum=model_configs['momentum'],
             weight_decay=model_configs['weight_decay'])
-    elif configs['method'] != 'stanet':
+    else:
         if model_configs['optimizer'] == 'adam':
             # Initialize optimizer
             optimizer = torch.optim.Adam(model.parameters(), lr=model_configs['learning_rate'])
@@ -68,15 +64,11 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                 momentum=model_configs['momentum'],
                 weight_decay=model_configs['weight_decay'])
 
-    if configs['method'] == 'stanet':
-        start_epoch = model_configs['epoch_count']
-        last_epoch = model_configs['niter'] + model_configs['niter_decay'] + 1
-    else:
-        # Initialize lr scheduler
-        lr_scheduler = init_lr_scheduler(optimizer, configs, model_configs, steps=len(train_loader))
+    # Initialize lr scheduler
+    lr_scheduler = init_lr_scheduler(optimizer, configs, model_configs, steps=len(train_loader))
 
-        start_epoch = 0
-        last_epoch = configs['epochs']
+    start_epoch = 0
+    last_epoch = configs['epochs']
 
     best_val = 0.0
     best_stats = {}
@@ -121,95 +113,72 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                     if configs['dem']:
                         dem = dem.to(device)
 
-                    if configs['method'] == 'stanet':
-                        total_iters += configs['batch_size']
-                        n_epoch = model_configs['niter'] + model_configs['niter_decay']
+                    inputs = []
+                    for inp in configs['inputs']:
+                        if inp == 'pre_event_1':
+                            if configs['dem']:
+                                inputs.append(torch.cat((pre_event_1, dem), dim=1))
+                            else:
+                                inputs.append(pre_event_1)
+                        elif inp == 'pre_event_2':
+                            if configs['dem']:
+                                inputs.append(torch.cat((pre_event_2, dem), dim=1))
+                            else:
+                                inputs.append(pre_event_2)
+                        elif inp == 'post_event':
+                            if configs['dem']:
+                                inputs.append(torch.cat((post_event, dem), dim=1))
+                            else:
+                                inputs.append(post_event)
 
-                        inputs = {}
-                        for inp in configs['inputs']:
-                            if inp == 'pre_event_1':
-                                inputs['A'] = pre_event_1
-                            elif inp == 'pre_event_2':
-                                inputs['A'] = pre_event_2
-                            elif inp == 'post_event':
-                                inputs['B'] = post_event
-                        inputs['L'] = mask
+                    optimizer.zero_grad()
+                    output = model(*inputs)
 
-                        model.set_input(inputs)         # unpack data from dataset and apply preprocessing
-                        dist, predictions = model.optimize_parameters()   # calculate loss functions, get gradients, update network weights
-                        predictions = predictions.argmax(1).to(dtype=torch.int8)
-                        loss_val = model.get_current_losses()['f']
+                    if configs['method'] == 'changeformer':
+                        if model_configs['multi_scale_infer']:
+                            final_output = torch.zeros(output[-1].size()).to(configs['device'])
+                            for pred in output:
+                                if pred.size(2) != output[-1].size(2):
+                                    final_output = final_output + F.interpolate(pred, size=output[-1].size(2), mode="nearest")
+                                else:
+                                    final_output = final_output + pred
+                            final_output = final_output / len(output)
+                        else:
+                            final_output = output[-1]
 
-                        # Note: loss.item() is averaged across all training examples of the current batch
-                        # so we multiply by the batch size to obtain the unaveraged current loss
-                        train_loss += (loss_val * pre_event_1.size(0))
+                        predictions = final_output.argmax(1)
                     else:
-                        inputs = []
-                        for inp in configs['inputs']:
-                            if inp == 'pre_event_1':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((pre_event_1, dem), dim=1))
+                        predictions = output.argmax(1)
+
+                    if configs['method'] == 'changeformer':
+                        if model_configs['multi_scale_train']:
+                            i = 0
+                            temp_loss = 0.0
+                            for pred in output:
+                                if pred.size(2) != mask.size(2):
+                                    temp_loss = temp_loss + model_configs['multi_pred_weights'][i] * criterion(pred, F.interpolate(mask, size=pred.size(2), mode="nearest"))
                                 else:
-                                    inputs.append(pre_event_1)
-                            elif inp == 'pre_event_2':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((pre_event_2, dem), dim=1))
-                                else:
-                                    inputs.append(pre_event_2)
-                            elif inp == 'post_event':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((post_event, dem), dim=1))
-                                else:
-                                    inputs.append(post_event)
-
-                        optimizer.zero_grad()
-                        output = model(*inputs)
-
-                        if configs['method'] == 'changeformer':
-                            if model_configs['multi_scale_infer']:
-                                final_output = torch.zeros(output[-1].size()).to(configs['device'])
-                                for pred in output:
-                                    if pred.size(2) != output[-1].size(2):
-                                        final_output = final_output + F.interpolate(pred, size=output[-1].size(2), mode="nearest")
-                                    else:
-                                        final_output = final_output + pred
-                                final_output = final_output / len(output)
-                            else:
-                                final_output = output[-1]
-
-                            predictions = final_output.argmax(1)
+                                    temp_loss = temp_loss + model_configs['multi_pred_weights'][i] * criterion(pred, mask)
+                                i+=1
+                            loss = temp_loss
                         else:
-                            predictions = output.argmax(1)
+                            loss = criterion(output[-1], mask)
+                    else:
+                        loss = criterion(output, mask)
 
-                        if configs['method'] == 'changeformer':
-                            if model_configs['multi_scale_train']:
-                                i = 0
-                                temp_loss = 0.0
-                                for pred in output:
-                                    if pred.size(2) != mask.size(2):
-                                        temp_loss = temp_loss + model_configs['multi_pred_weights'][i] * criterion(pred, F.interpolate(mask, size=pred.size(2), mode="nearest"))
-                                    else:
-                                        temp_loss = temp_loss + model_configs['multi_pred_weights'][i] * criterion(pred, mask)
-                                    i+=1
-                                loss = temp_loss
-                            else:
-                                loss = criterion(output[-1], mask)
-                        else:
-                            loss = criterion(output, mask)
+                    # Note: loss.item() is averaged across all training examples of the current batch
+                    # so we multiply by the batch size to obtain the unaveraged current loss
+                    train_loss += (loss.item() * pre_event_1.size(0))
 
-                        # Note: loss.item() is averaged across all training examples of the current batch
-                        # so we multiply by the batch size to obtain the unaveraged current loss
-                        train_loss += (loss.item() * pre_event_1.size(0))
+                    if configs['mixed_precision']:
+                        scaler.scale(loss).backward()
+                        scaler.step(optimizer)
+                        scaler.update()
+                    else:
+                        loss.backward()
+                        optimizer.step()
 
-                        if configs['mixed_precision']:
-                            scaler.scale(loss).backward()
-                            scaler.step(optimizer)
-                            scaler.update()
-                        else:
-                            loss.backward()
-                            optimizer.step()
-
-                        loss_val = loss.item()
+                    loss_val = loss.item()
 
                 acc = accuracy(predictions, mask)
                 score = fscore(predictions, mask)
@@ -251,62 +220,30 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                     print(f'Train IoU ({CLASS_LABELS[1]}): {100 * ious[1].item()}')
                     print(f'Train IoU ({CLASS_LABELS[2]}): {100 * ious[2].item()}')
                     print(f'Train MeanIoU: {mean_iou * 100}')
-
-                    if configs['method'] == 'stanet':
-                        lrs = model.get_current_lrs()
-                        print(f'lrs: {lrs}')
-                    else:
-                        print(f'lr: {lr_scheduler.get_last_lr()[0]}')
+                    print(f'lr: {lr_scheduler.get_last_lr()[0]}')
 
                 elif configs['wandb_activate']:
-                    if configs['method'] == 'stanet':
-                        lrs = model.get_current_lrs()
-
-                        log_dict = {
-                            'Epoch': epoch,
-                            'Iteration': index,
-                            'Train Loss': loss_val,
-                            f'Train Accuracy ({CLASS_LABELS[0]})': 100 * acc[0].item(),
-                            f'Train Accuracy ({CLASS_LABELS[1]})': 100 * acc[1].item(),
-                            f'Train Accuracy ({CLASS_LABELS[2]})': 100 * acc[2].item(),
-                            f'Train F-Score ({CLASS_LABELS[0]})': 100 * score[0].item(),
-                            f'Train F-Score ({CLASS_LABELS[1]})': 100 * score[1].item(),
-                            f'Train F-Score ({CLASS_LABELS[2]})': 100 * score[2].item(),
-                            f'Train Precision ({CLASS_LABELS[0]})': 100 * prec[0].item(),
-                            f'Train Precision ({CLASS_LABELS[1]})': 100 * prec[1].item(),
-                            f'Train Precision ({CLASS_LABELS[2]})': 100 * prec[2].item(),
-                            f'Train Recall ({CLASS_LABELS[0]})': 100 * rec[0].item(),
-                            f'Train Recall ({CLASS_LABELS[1]})': 100 * rec[1].item(),
-                            f'Train Recall ({CLASS_LABELS[2]})': 100 * rec[2].item(),
-                            f'Train IoU ({CLASS_LABELS[0]})': 100 * ious[0].item(),
-                            f'Train IoU ({CLASS_LABELS[1]})': 100 * ious[1].item(),
-                            f'Train IoU ({CLASS_LABELS[2]})': 100 * ious[2].item(),
-                            'Train MeanIoU': mean_iou * 100,
-                            'lr1': lrs[0],
-                            'lr2': lrs[1]
-                        }
-                    else:
-                        log_dict = {
-                            'Epoch': epoch,
-                            'Iteration': index,
-                            'Train Loss': loss_val,
-                            f'Train Accuracy ({CLASS_LABELS[0]})': 100 * acc[0].item(),
-                            f'Train Accuracy ({CLASS_LABELS[1]})': 100 * acc[1].item(),
-                            f'Train Accuracy ({CLASS_LABELS[2]})': 100 * acc[2].item(),
-                            f'Train F-Score ({CLASS_LABELS[0]})': 100 * score[0].item(),
-                            f'Train F-Score ({CLASS_LABELS[1]})': 100 * score[1].item(),
-                            f'Train F-Score ({CLASS_LABELS[2]})': 100 * score[2].item(),
-                            f'Train Precision ({CLASS_LABELS[0]})': 100 * prec[0].item(),
-                            f'Train Precision ({CLASS_LABELS[1]})': 100 * prec[1].item(),
-                            f'Train Precision ({CLASS_LABELS[2]})': 100 * prec[2].item(),
-                            f'Train Recall ({CLASS_LABELS[0]})': 100 * rec[0].item(),
-                            f'Train Recall ({CLASS_LABELS[1]})': 100 * rec[1].item(),
-                            f'Train Recall ({CLASS_LABELS[2]})': 100 * rec[2].item(),
-                            f'Train IoU ({CLASS_LABELS[0]})': 100 * ious[0].item(),
-                            f'Train IoU ({CLASS_LABELS[1]})': 100 * ious[1].item(),
-                            f'Train IoU ({CLASS_LABELS[2]})': 100 * ious[2].item(),
-                            'Train MeanIoU': mean_iou * 100,
-                            'lr': lr_scheduler.get_last_lr()[0]
+                    log_dict = {
+                        'Epoch': epoch,
+                        'Iteration': index,
+                        'Train Loss': loss_val,
+                        f'Train Accuracy ({CLASS_LABELS[0]})': 100 * acc[0].item(),
+                        f'Train Accuracy ({CLASS_LABELS[1]})': 100 * acc[1].item(),
+                        f'Train Accuracy ({CLASS_LABELS[2]})': 100 * acc[2].item(),
+                        f'Train F-Score ({CLASS_LABELS[0]})': 100 * score[0].item(),
+                        f'Train F-Score ({CLASS_LABELS[1]})': 100 * score[1].item(),
+                        f'Train F-Score ({CLASS_LABELS[2]})': 100 * score[2].item(),
+                        f'Train Precision ({CLASS_LABELS[0]})': 100 * prec[0].item(),
+                        f'Train Precision ({CLASS_LABELS[1]})': 100 * prec[1].item(),
+                        f'Train Precision ({CLASS_LABELS[2]})': 100 * prec[2].item(),
+                        f'Train Recall ({CLASS_LABELS[0]})': 100 * rec[0].item(),
+                        f'Train Recall ({CLASS_LABELS[1]})': 100 * rec[1].item(),
+                        f'Train Recall ({CLASS_LABELS[2]})': 100 * rec[2].item(),
+                        f'Train IoU ({CLASS_LABELS[0]})': 100 * ious[0].item(),
+                        f'Train IoU ({CLASS_LABELS[1]})': 100 * ious[1].item(),
+                        f'Train IoU ({CLASS_LABELS[2]})': 100 * ious[2].item(),
+                        'Train MeanIoU': mean_iou * 100,
+                        'lr': lr_scheduler.get_last_lr()[0]
                     }
 
                     if configs['log_AOI_metrics']:
@@ -344,16 +281,13 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                 pbar.update(1)
 
         if index % configs['train_save_checkpoint_freq'] == 0:
-            if configs['method'] == 'stanet':
-                model.save_networks(epoch)
-            else:
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'lr_scheduler_state_dict': lr_scheduler.state_dict(),
-                    'loss': loss_val
-                    }, Path(configs['checkpoint_path']) / f'checkpoint_epoch={epoch}.pt')
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'lr_scheduler_state_dict': lr_scheduler.state_dict(),
+                'loss': loss_val
+                }, Path(configs['checkpoint_path']) / f'checkpoint_epoch={epoch}.pt')
 
         total_train_accuracy = accuracy.compute()
         total_train_fscore = fscore.compute()
@@ -361,11 +295,8 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
         total_train_rec = recall.compute()
         total_train_iou = iou.compute()
 
-        if configs['method'] == 'stanet':
-            model.update_learning_rate()
-        else:
-            # Update LR scheduler
-            lr_scheduler.step()
+        # Update LR scheduler
+        lr_scheduler.step()
 
         #Evaluate on validation set
         val_acc, val_score, miou = eval_change_detection(model, val_loader, settype='Validation', configs=configs, model_configs=model_configs)
@@ -377,20 +308,17 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
             best_stats['acc'] = best_val
             best_stats['epoch'] = epoch
 
-            if configs['method'] == 'stanet':
-                model.save_networks(epoch, best_segmentation=True)
-            else:
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'lr_scheduler_state_dict': lr_scheduler.state_dict(),
-                    'loss': loss_val
-                    }, Path(configs['checkpoint_path']) / 'best_segmentation.pt')
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'lr_scheduler_state_dict': lr_scheduler.state_dict(),
+                'loss': loss_val
+                }, Path(configs['checkpoint_path']) / 'best_segmentation.pt')
 
-                with open(Path(configs['checkpoint_path']) / 'best_segmentation.txt', 'w') as f:
-                    f.write(f'{epoch}\n')
-                    f.write(f'{miou}')
+            with open(Path(configs['checkpoint_path']) / 'best_segmentation.txt', 'w') as f:
+                f.write(f'{epoch}\n')
+                f.write(f'{miou}')
 
 
 def eval_change_detection(model, loader, settype, configs=None, model_configs=None):
@@ -407,8 +335,7 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
     if configs['log_AOI_metrics']:
         activ_metrics = {activ: initialize_metrics(configs, mode='val') for activ in loader.dataset.activations}
 
-    if configs['method'] != 'stanet':
-        criterion = create_loss(configs, mode='val')
+    criterion = create_loss(configs, mode='val')
 
     total_iters = 0
     total_loss = 0.0
@@ -442,63 +369,38 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
                     if configs['dem']:
                         dem = dem.to(device)
 
-                    if configs['method'] == 'stanet':
-                        total_iters += configs['batch_size']
-                        n_epoch = model_configs['niter'] + model_configs['niter_decay']
+                    inputs = []
+                    for inp in configs['inputs']:
+                        if inp == 'pre_event_1':
+                            if configs['dem']:
+                                inputs.append(torch.cat((pre_event_1, dem), dim=1))
+                            else:
+                                inputs.append(pre_event_1)
+                        elif inp == 'pre_event_2':
+                            if configs['dem']:
+                                inputs.append(torch.cat((pre_event_2, dem), dim=1))
+                            else:
+                                inputs.append(pre_event_2)
+                        elif inp == 'post_event':
+                            if configs['dem']:
+                                inputs.append(torch.cat((post_event, dem), dim=1))
+                            else:
+                                inputs.append(post_event)
 
-                        inputs = {}
-                        for inp in configs['inputs']:
-                            if inp == 'pre_event_1':
-                                inputs['A'] = pre_event_1
-                            elif inp == 'pre_event_2':
-                                inputs['A'] = pre_event_2
-                            elif inp == 'post_event':
-                                inputs['B'] = post_event
-                        inputs['L'] = mask
+                    output = model(*inputs)
 
-                        model.set_input(inputs)  # unpack data from dataset and apply preprocessing
-                        dist, predictions = model.test()   # make inference
-                        predictions = predictions.argmax(1).to(dtype=torch.int8)
+                    if configs['method'] == 'changeformer':
+                        output = output[-1]
 
-                        if settype != 'Test':
-                            loss_val = model.get_current_losses()['f']
+                    predictions = output.argmax(1)
 
-                            # Note: loss.item() is averaged across all training examples of the current batch
-                            # so we multiply by the batch size to obtain the unaveraged current loss
-                            total_loss += (loss_val * pre_event_1.size(0))
-                    else:
-                        inputs = []
-                        for inp in configs['inputs']:
-                            if inp == 'pre_event_1':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((pre_event_1, dem), dim=1))
-                                else:
-                                    inputs.append(pre_event_1)
-                            elif inp == 'pre_event_2':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((pre_event_2, dem), dim=1))
-                                else:
-                                    inputs.append(pre_event_2)
-                            elif inp == 'post_event':
-                                if configs['dem']:
-                                    inputs.append(torch.cat((post_event, dem), dim=1))
-                                else:
-                                    inputs.append(post_event)
+                    loss = criterion(output, mask)
 
-                        output = model(*inputs)
+                    # Note: loss.item() is averaged across all training examples of the current batch
+                    # so we multiply by the batch size to obtain the unaveraged current loss
+                    total_loss += (loss.item() * pre_event_1.size(0))
 
-                        if configs['method'] == 'changeformer':
-                            output = output[-1]
-
-                        predictions = output.argmax(1)
-
-                        loss = criterion(output, mask)
-
-                        # Note: loss.item() is averaged across all training examples of the current batch
-                        # so we multiply by the batch size to obtain the unaveraged current loss
-                        total_loss += (loss.item() * pre_event_1.size(0))
-
-                        loss_val = loss.item()
+                    loss_val = loss.item()
 
                     accuracy(predictions, mask)
                     fscore(predictions, mask)

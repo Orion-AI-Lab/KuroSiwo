@@ -95,24 +95,24 @@ def initialize_segmentation_model(config, model_configs):
 def initialize_cd_model(configs, model_configs, phase="train"):
     if configs["method"].lower() == "siam-conc":
         model = SiamUnet_conc(
-            input_nbr=len(configs["channels"]), label_nbr=configs["num_classes"]
+            input_nbr=len(configs["num_channels"]), label_nbr=configs["num_classes"]
         )
     elif configs["method"].lower() == "siam-diff":
         model = SiamUnet_diff(
-            input_nbr=len(configs["channels"]), label_nbr=configs["num_classes"]
+            input_nbr=len(configs["num_channels"]), label_nbr=configs["num_classes"]
         )
     elif configs["method"].lower() == "bit-cd":
-        model = define_G(model_configs, in_channels=len(configs["channels"]))
+        model = define_G(model_configs, in_channels=len(configs["num_channels"]))
     elif configs["method"].lower() == "hfa-net":
         model = HFANet(
-            input_channel=len(configs["channels"]),
+            input_channel=len(configs["num_channels"]),
             input_size=224,
             num_classes=configs["num_classes"],
         )
     elif configs["method"].lower() == "changeformer":
         model = ChangeFormerV6(
             embed_dim=model_configs["embed_dim"],
-            input_nc=len(configs["channels"]),
+            input_nc=len(configs["num_channels"]),
             output_nc=configs["num_classes"],
             decoder_softmax=model_configs["decoder_softmax"],
         )
@@ -141,7 +141,7 @@ def initialize_cd_model(configs, model_configs, phase="train"):
         )
 
     if configs["resume_checkpoint"]:
-        checkpoint = torch.load(configs["resume_checkpoint"])
+        checkpoint = torch.load(configs["resume_checkpoint"], map_location=configs['device'])
         model.load_state_dict(checkpoint["model_state_dict"])
 
     print(model)

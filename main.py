@@ -141,13 +141,10 @@ if __name__ == "__main__":
             configs["checkpoint_path"] + "/" + "best_segmentation.pt",
         )
 
-        if configs["method"] == "stanet":
-            model.load_networks(best_segmentation=True)
-        else:
-            checkpoint = torch.load(
-                configs["checkpoint_path"] + "/" + "best_segmentation.pt"
-            )
-            model.load_state_dict(checkpoint["model_state_dict"])
+        checkpoint = torch.load(
+            configs["checkpoint_path"] + "/" + "best_segmentation.pt"
+        )
+        model.load_state_dict(checkpoint["model_state_dict"])
 
         test_acc, test_score, miou = eval_change_detection(
             model,

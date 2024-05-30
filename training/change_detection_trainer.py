@@ -367,7 +367,7 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
                     mask = mask.to(configs['device'])
 
                     if configs['dem']:
-                        dem = dem.to(device)
+                        dem = dem.to(configs['device'])
 
                     inputs = []
                     for inp in configs['inputs']:

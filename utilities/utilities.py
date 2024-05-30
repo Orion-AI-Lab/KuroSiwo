@@ -376,8 +376,6 @@ def update_config(config, args=None):
     # Compute total number of input channels
     if config['task'] == 'cd':
         config['num_channels'] = len(config['channels'])
-        if config['permanent_water_mask']:
-            config['num_channels'] += 1
         if config['dem']:
             config['num_channels'] += 1
     else:

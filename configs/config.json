@@ -1,5 +1,5 @@
 {
-  "task": "segmentation", // method category, options: segmentation, change detection, mae (Masked Autoencoder)
+  "task": "segmentation", // method category, options: segmentation, cd, mae (Masked Autoencoder)
   "root_path":"KuroSiwo/", //your data root path
   "wandb_project": "Your_Project",
   "wandb_entity": "your_entity",

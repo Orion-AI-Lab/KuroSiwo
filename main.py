@@ -142,7 +142,7 @@ if __name__ == "__main__":
         )
 
         checkpoint = torch.load(
-            configs["checkpoint_path"] + "/" + "best_segmentation.pt"
+            configs["checkpoint_path"] + "/" + "best_segmentation.pt", map_location=configs['device']
         )
         model.load_state_dict(checkpoint["model_state_dict"])
 

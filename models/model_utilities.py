@@ -214,6 +214,8 @@ def initialize_cd_model(configs, model_configs, phase="train"):
             siamese=configs['siamese']
         )
 
+    model = model.to(configs['device'])
+
     if configs["resume_checkpoint"]:
         checkpoint = torch.load(configs["resume_checkpoint"], map_location=configs['device'])
         model.load_state_dict(checkpoint["model_state_dict"])

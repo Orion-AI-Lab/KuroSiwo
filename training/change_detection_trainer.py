@@ -346,7 +346,7 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
     random_index = 0 #random.randint(0,len(loader)-1)
     with tqdm(initial=0, total=len(loader)) as pbar:
         for index, batch in enumerate(loader):
-            with torch.cuda.amp.autocast(enabled=configs['mixed_precision']):
+            with torch.cuda.amp.autocast(enabled=False):
                 with torch.no_grad():
                     if configs['scale_input'] is not None:
                         if configs['dem']:

@@ -111,7 +111,7 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                     mask = mask.to(configs['device'])
 
                     if configs['dem']:
-                        dem = dem.to(device)
+                        dem = dem.to(configs['device'])
 
                     inputs = []
                     for inp in configs['inputs']:

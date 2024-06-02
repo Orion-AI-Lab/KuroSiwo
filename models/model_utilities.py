@@ -176,7 +176,7 @@ def initialize_cd_model(configs, model_configs, phase="train"):
             input_nbr=configs["num_channels"], label_nbr=configs["num_classes"]
         )
     elif configs["method"].lower() == "bit-cd":
-        model = define_G(model_configs, in_channels=len(configs["num_channels"]))
+        model = define_G(model_configs, in_channels=configs["num_channels"])
     elif configs["method"].lower() == "hfa-net":
         model = HFANet(
             input_channel=configs["num_channels"],

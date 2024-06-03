@@ -204,31 +204,29 @@ def train(configs):
     for epoch in range(start_epoch, configs["epochs"]):
         train_epoch(loader, model, optimizer, epoch, configs, scaler)
         if epoch % 1 == 0:
-            if not configs["distributed"]:
-                torch.save(
-                    model.state_dict(),
-                    os.path.join(
-                        configs["checkpoint_path"], "mae_" + str(epoch) + ".pt"
-                    ),
-                )
-                torch.save(
-                    model.encoder,
-                    os.path.join(
-                        configs["checkpoint_path"], "vit_" + str(epoch) + ".pt"
-                    ),
-                )
+            torch.save(
+                model.state_dict(),
+                os.path.join(
+                    configs["checkpoint_path"], "mae_" + str(epoch) + ".pt"
+                ),
+            )
+            torch.save(
+                model.encoder,
+                os.path.join(
+                    configs["checkpoint_path"], "vit_" + str(epoch) + ".pt"
+                ),
+            )
 
-    if not configs["distributed"]:
-        torch.save(
-            model.encoder.state_dict(),
-            os.path.join(
-                configs["checkpoint_path"], "mae_vit_" + str(configs["epochs"]) + ".pt"
-            ),
-        )
-        torch.save(
-            model.encoder,
-            os.path.join(
-                configs["checkpoint_path"],
-                "trained_vit_" + str(configs["epochs"]) + ".pt",
-            ),
-        )
+    torch.save(
+        model.encoder.state_dict(),
+        os.path.join(
+            configs["checkpoint_path"], "mae_vit_" + str(configs["epochs"]) + ".pt"
+        ),
+    )
+    torch.save(
+        model.encoder,
+        os.path.join(
+            configs["checkpoint_path"],
+            "trained_vit_" + str(configs["epochs"]) + ".pt",
+        ),
+    )

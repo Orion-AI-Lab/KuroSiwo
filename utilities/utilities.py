@@ -367,12 +367,6 @@ def update_config(config, args=None):
         )
         config.update(augmentation_config)
 
-        # Distributed options
-        if config["distributed"]:
-            distributed_path = "configs/distributed/distributed_configs.json"
-            configs_distr = json.load(open(distributed_path, "r"))
-            config.update(configs_distr)
-
     # Compute total number of input channels
     if config['task'] == 'cd':
         config['num_channels'] = len(config['channels'])

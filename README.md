@@ -1,6 +1,6 @@
 # [Kuro Siwo: A global multi-temporal SAR dataset for rapid flood mapping](https://arxiv.org/abs/2311.12056)  (WIP)
 
-
+# Kuro Siwo V2 - to be updated (soon)
 ![Kuro Siwo](imgs/kuro_spatial.png)
 
 ### Citation

@@ -1,6 +1,5 @@
 # [Kuro Siwo: A global multi-temporal SAR dataset for rapid flood mapping](https://arxiv.org/abs/2311.12056)
 
-### Kuro Siwo v2 is up.
   #### Latest updates:
     - [✔️] More events outside of Europe (43 in total)
     - [✔️] We included the respective SLC products and cropped patches in Kuro Siwo
@@ -21,7 +20,11 @@ If you use this work please cite:
   url={https://api.semanticscholar.org/CorpusID:265308874}
 }
 ```
-
+# Table of Contents
+- [Download the dataset](#download-kuro-siwo)
+- [Data preprocessing](#data-preprocessing)
+- [Repository structure](#kuro-siwo-repo-structure)
+- [Pretrained models](#pretrained-models)
 ### Download Kuro Siwo
   #### GRD Data
 - The Kuro Siwo GRD Dataset can be downloaded either:
@@ -35,16 +38,16 @@ If you use this work please cite:
     1. Make sure to grant the necessary rights by executing `chmod +x scripts/download_kuro_siwo.sh`
     2. Execute `scripts/download_kuro_siwo.sh DESIRED_DATASET_ROOT_PATH` e.g: `./download_kuro_siwo.sh KuroRoot`
    
-  #### SLC Data
-  The SLC Preprocessed products can be downloaded from the following [link](https://www.dropbox.com/scl/fo/kknf6ycz6ywffopjxroys/AOIedl2NgWnOXQBEDUGv4m0?rlkey=rb18w8rzpwitg2w3nlhzklnyy&st=p1vv516h&dl=0).
+#### SLC Data
+  - The SLC Preprocessed products can be downloaded from the following [link](https://www.dropbox.com/scl/fo/kknf6ycz6ywffopjxroys/AOIedl2NgWnOXQBEDUGv4m0?rlkey=rb18w8rzpwitg2w3nlhzklnyy&st=p1vv516h&dl=0).
 
-  Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).  
+  - Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).  
 
 
 ### Data preprocessing
 
 The preprocessing pipelines used to generate the GRD and SLC products can be found at `configs/grd_preprocessing.xml` and `configs/slc_preprocessing.xml` repsectively.
-#### Kuro Siwo repo structure 
+### Kuro Siwo repo structure 
   - Kuro Siwo uses the [black](https://github.com/psf/black) python formatter. To activate it install pre-commit, running `pip install pre-commit`
 and execute `pre-commit install`.
   - Training starts by running `python main.py`. The configurations are defined in the `configs` directory
@@ -61,7 +64,7 @@ and execute `pre-commit install`.
       ```
 
 
-#### Pretrained models
+### Pretrained models
 The weights of the top performing models can be accessed using the following links:
   - [FloodViT](https://www.dropbox.com/scl/fi/srw7u4cw1gtxrf4xzmsh7/floodvit.pt?rlkey=snskpq1qrdav5u2jya8k2bocg&dl=0)
   - [SNUNet](https://www.dropbox.com/scl/fi/3vlsveoobqe1wc71s5z2d/best_segmentation.pt?rlkey=xpy2thmozzxfzymr8b13m7n51&dl=0)

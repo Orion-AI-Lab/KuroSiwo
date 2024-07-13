@@ -15,8 +15,9 @@ If you use this work please cite:
 ```
 
 ### Download Kuro Siwo
-- The Kuro Siwo Dataset can be downloaded either:
-  - from the following [link](https://www.dropbox.com/scl/fo/nkqaa9se5zl3yng4bdai4/h?rlkey=bro222cvgu4lo3b4towo6gbmm&dl=0),
+  #### GRD Data
+- The Kuro Siwo GRD Dataset can be downloaded either:
+  - from the following [link](https://www.dropbox.com/scl/fo/xc69aclh0q4lykd22ynkb/AAaDu8gBtoSdOpmffv7JY50?rlkey=uds2b2aot6oubc9hmnrm7myy7&st=21u41kwx&dl=0),
 
 
   - or by executing ```scripts/download_kuro_siwo.sh```. This script will download and prepare the Kuro Siwo dataset for deep learning.
@@ -26,7 +27,15 @@ If you use this work please cite:
     1. Make sure to grant the necessary rights by executing `chmod +x scripts/download_kuro_siwo.sh`
     2. Execute `scripts/download_kuro_siwo.sh DESIRED_DATASET_ROOT_PATH` e.g: `./download_kuro_siwo.sh KuroRoot`
    
+  #### SLC Data
+  The SLC Preprocessed products can be downloaded from the following [link](https://www.dropbox.com/scl/fo/kknf6ycz6ywffopjxroys/AOIedl2NgWnOXQBEDUGv4m0?rlkey=rb18w8rzpwitg2w3nlhzklnyy&st=p1vv516h&dl=0).
 
+  Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).  
+
+
+### Data preprocessing
+
+The preprocessing pipelines used to generate the GRD and SLC products can be found at `configs/grd_preprocessing.xml` and `configs/slc_preprocessing.xml` repsectively.
 #### Kuro Siwo repo structure 
   - Kuro Siwo uses the [black](https://github.com/psf/black) python formatter. To activate it install pre-commit, running `pip install pre-commit`
 and execute `pre-commit install`.

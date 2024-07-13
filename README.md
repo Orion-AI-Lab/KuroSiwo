@@ -1,6 +1,14 @@
 # [Kuro Siwo: A global multi-temporal SAR dataset for rapid flood mapping](https://arxiv.org/abs/2311.12056)  (WIP)
 
-# Kuro Siwo V2 - to be updated (soon)
+### Kuro Siwo v2 is up.
+  #### Latest updates:
+    - [✔️] More events outside of Europe (43 in total)
+    - [✔️] We included the respective SLC products and cropped patches in Kuro Siwo
+    - [✔️] Downloading script and links have been updated for the new version
+    - [✔️] Preprocessing pipelines for both GRD and SLC data can be found in `configs/`
+    - [✔️] Updated [paper](https://arxiv.org/abs/2311.12056)
+    - [ ] TODO: minor updates to training and dataloading code 
+
 ![Kuro Siwo](imgs/kuro_spatial.png)
 
 ### Citation
@@ -20,7 +28,7 @@ If you use this work please cite:
   - from the following [link](https://www.dropbox.com/scl/fo/xc69aclh0q4lykd22ynkb/AAaDu8gBtoSdOpmffv7JY50?rlkey=uds2b2aot6oubc9hmnrm7myy7&st=21u41kwx&dl=0),
 
 
-  - or by executing ```scripts/download_kuro_siwo.sh```. This script will download and prepare the Kuro Siwo dataset for deep learning.
+  - or by executing ```scripts/download_kuro_siwo.sh```. This script will download and prepare the Kuro Siwo GRDD dataset for deep learning.
 
     #### Usage 
 

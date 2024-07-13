@@ -6,11 +6,11 @@
 ### Citation
 If you use this work please cite:
 ```
-@article{bountos2023kuro,
-  title={Kuro Siwo: 12.1 billion $ m\^{} 2$ under the water. A global multi-temporal satellite dataset for rapid flood mapping},
-  author={Bountos, Nikolaos Ioannis and Sdraka, Maria and Zavras, Angelos and Karasante, Ilektra and Karavias, Andreas and Herekakis, Themistocles and Thanasou, Angeliki and Michail, Dimitrios and Papoutsis, Ioannis},
-  journal={arXiv preprint arXiv:2311.12056},
-  year={2023}
+@inproceedings{Bountos2023KuroS3,
+  title={Kuro Siwo: 33 billion \$m^2\$ under the water. A global multi-temporal satellite dataset for rapid flood mapping},
+  author={Nikolaos Ioannis Bountos and Maria Sdraka and Angelos Zavras and Ilektra Karasante and Andreas Karavias and Themistocles Herekakis and Angeliki Thanasou and Dimitrios Michail and Ioannis Papoutsis},
+  year={2023},
+  url={https://api.semanticscholar.org/CorpusID:265308874}
 }
 ```
 

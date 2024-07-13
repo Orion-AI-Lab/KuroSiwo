@@ -10,21 +10,13 @@
 
 ![Kuro Siwo](imgs/kuro_spatial.png)
 
-### Citation
-If you use this work please cite:
-```
-@inproceedings{Bountos2023KuroS3,
-  title={Kuro Siwo: 33 billion \$m^2\$ under the water. A global multi-temporal satellite dataset for rapid flood mapping},
-  author={Nikolaos Ioannis Bountos and Maria Sdraka and Angelos Zavras and Ilektra Karasante and Andreas Karavias and Themistocles Herekakis and Angeliki Thanasou and Dimitrios Michail and Ioannis Papoutsis},
-  year={2023},
-  url={https://api.semanticscholar.org/CorpusID:265308874}
-}
-```
+
 # Table of Contents
 - [Download the dataset](#download-kuro-siwo)
 - [Data preprocessing](#data-preprocessing)
 - [Repository structure](#kuro-siwo-repo-structure)
 - [Pretrained models](#pretrained-models)
+- [Citation](#citation)
 ### Download Kuro Siwo
   #### GRD Data
 - The Kuro Siwo GRD Dataset can be downloaded either:
@@ -68,3 +60,14 @@ and execute `pre-commit install`.
 The weights of the top performing models can be accessed using the following links:
   - [FloodViT](https://www.dropbox.com/scl/fi/srw7u4cw1gtxrf4xzmsh7/floodvit.pt?rlkey=snskpq1qrdav5u2jya8k2bocg&dl=0)
   - [SNUNet](https://www.dropbox.com/scl/fi/3vlsveoobqe1wc71s5z2d/best_segmentation.pt?rlkey=xpy2thmozzxfzymr8b13m7n51&dl=0)
+
+### Citation
+If you use this work please cite:
+```
+@inproceedings{Bountos2023KuroS3,
+  title={Kuro Siwo: 33 billion \$m^2\$ under the water. A global multi-temporal satellite dataset for rapid flood mapping},
+  author={Nikolaos Ioannis Bountos and Maria Sdraka and Angelos Zavras and Ilektra Karasante and Andreas Karavias and Themistocles Herekakis and Angeliki Thanasou and Dimitrios Michail and Ioannis Papoutsis},
+  year={2023},
+  url={https://api.semanticscholar.org/CorpusID:265308874}
+}
+```

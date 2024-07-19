@@ -9,6 +9,7 @@ from torchmetrics import Accuracy, F1Score, JaccardIndex, Precision, Recall
 from torchvision.transforms import Normalize
 
 import dataset.Dataset as Dataset
+from .bce_and_dice import BCEandDiceLoss
 
 
 def create_checkpoint_directory(configs, model_configs):
@@ -337,6 +338,12 @@ def create_loss(configs, mode="val"):
             reduction="mean",
             force_reload=False,
         ).to(configs["device"])
+    elif configs['loss_function'] == 'ce+dice':
+        if 'class_weights' in configs.keys():
+            class_weights = torch.tensor(configs['class_weights'])
+        else:
+            class_weights = torch.tensor([1.0, 1.0, 1.0])
+        return BCEandDiceLoss(weights=class_weights, ignore_index=3, use_softmax=True).to(configs['device'])
 
 
 def update_config(config, args=None):

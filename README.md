@@ -64,10 +64,13 @@ The weights of the top performing models can be accessed using the following lin
 ### Citation
 If you use this work please cite:
 ```
-@inproceedings{Bountos2023KuroS3,
-  title={Kuro Siwo: 33 billion \$m^2\$ under the water. A global multi-temporal satellite dataset for rapid flood mapping},
-  author={Nikolaos Ioannis Bountos and Maria Sdraka and Angelos Zavras and Ilektra Karasante and Andreas Karavias and Themistocles Herekakis and Angeliki Thanasou and Dimitrios Michail and Ioannis Papoutsis},
-  year={2023},
-  url={https://api.semanticscholar.org/CorpusID:265308874}
+@misc{bountos2024kurosiwo33billion,
+      title={Kuro Siwo: 33 billion $m^2$ under the water. A global multi-temporal satellite dataset for rapid flood mapping}, 
+      author={Nikolaos Ioannis Bountos and Maria Sdraka and Angelos Zavras and Ilektra Karasante and Andreas Karavias and Themistocles Herekakis and Angeliki Thanasou and Dimitrios Michail and Ioannis Papoutsis},
+      year={2024},
+      eprint={2311.12056},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2311.12056}, 
 }
 ```

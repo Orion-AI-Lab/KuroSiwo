@@ -200,84 +200,6 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
                 if index % configs['print_frequency'] == 0:
                     pbar.set_description(f'({epoch}) Train Loss: {train_loss:.4f}')
 
-                if configs['on_screen_prints'] and (index % configs['print_frequency'] == 0):
-                    print(f'Epoch: {epoch}')
-                    print(f'Iteration: {index}')
-                    print(f'Train Loss: {loss_val}')
-                    print(f'Train Accuracy ({CLASS_LABELS[0]}): {100 * acc[0].item()}')
-                    print(f'Train Accuracy ({CLASS_LABELS[1]}): {100 * acc[1].item()}')
-                    print(f'Train Accuracy ({CLASS_LABELS[2]}): {100 * acc[2].item()}')
-                    print(f'Train F-Score ({CLASS_LABELS[0]}): {100 * score[0].item()}')
-                    print(f'Train F-Score ({CLASS_LABELS[1]}): {100 * score[1].item()}')
-                    print(f'Train F-Score ({CLASS_LABELS[2]}): {100 * score[2].item()}')
-                    print(f'Train Precision ({CLASS_LABELS[0]}): {100 * prec[0].item()}')
-                    print(f'Train Precision ({CLASS_LABELS[1]}): {100 * prec[1].item()}')
-                    print(f'Train Precision ({CLASS_LABELS[2]}): {100 * prec[2].item()}')
-                    print(f'Train Recall ({CLASS_LABELS[0]}): {100 * rec[0].item()}')
-                    print(f'Train Recall ({CLASS_LABELS[1]}): {100 * rec[1].item()}')
-                    print(f'Train Recall ({CLASS_LABELS[2]}): {100 * rec[2].item()}')
-                    print(f'Train IoU ({CLASS_LABELS[0]}): {100 * ious[0].item()}')
-                    print(f'Train IoU ({CLASS_LABELS[1]}): {100 * ious[1].item()}')
-                    print(f'Train IoU ({CLASS_LABELS[2]}): {100 * ious[2].item()}')
-                    print(f'Train MeanIoU: {mean_iou * 100}')
-                    print(f'lr: {lr_scheduler.get_last_lr()[0]}')
-
-                elif configs['wandb_activate']:
-                    log_dict = {
-                        'Epoch': epoch,
-                        'Iteration': index,
-                        'Train Loss': loss_val,
-                        f'Train Accuracy ({CLASS_LABELS[0]})': 100 * acc[0].item(),
-                        f'Train Accuracy ({CLASS_LABELS[1]})': 100 * acc[1].item(),
-                        f'Train Accuracy ({CLASS_LABELS[2]})': 100 * acc[2].item(),
-                        f'Train F-Score ({CLASS_LABELS[0]})': 100 * score[0].item(),
-                        f'Train F-Score ({CLASS_LABELS[1]})': 100 * score[1].item(),
-                        f'Train F-Score ({CLASS_LABELS[2]})': 100 * score[2].item(),
-                        f'Train Precision ({CLASS_LABELS[0]})': 100 * prec[0].item(),
-                        f'Train Precision ({CLASS_LABELS[1]})': 100 * prec[1].item(),
-                        f'Train Precision ({CLASS_LABELS[2]})': 100 * prec[2].item(),
-                        f'Train Recall ({CLASS_LABELS[0]})': 100 * rec[0].item(),
-                        f'Train Recall ({CLASS_LABELS[1]})': 100 * rec[1].item(),
-                        f'Train Recall ({CLASS_LABELS[2]})': 100 * rec[2].item(),
-                        f'Train IoU ({CLASS_LABELS[0]})': 100 * ious[0].item(),
-                        f'Train IoU ({CLASS_LABELS[1]})': 100 * ious[1].item(),
-                        f'Train IoU ({CLASS_LABELS[2]})': 100 * ious[2].item(),
-                        'Train MeanIoU': mean_iou * 100,
-                        'lr': lr_scheduler.get_last_lr()[0]
-                    }
-
-                    if configs['log_AOI_metrics']:
-                        activ_i_metrics = {}
-                        for activ_i, activ_i_metrics_f in activ_metrics.items():
-                            activ_i_metrics[activ_i] = {}
-                            activ_i_metrics[activ_i]['accuracy'] = activ_i_metrics_f[0].compute() # accuracy
-                            activ_i_metrics[activ_i]['fscore'] = activ_i_metrics_f[1].compute() # fscore
-                            activ_i_metrics[activ_i]['precision'] = activ_i_metrics_f[2].compute() # precision
-                            activ_i_metrics[activ_i]['recall'] = activ_i_metrics_f[3].compute() # recall
-                            activ_i_metrics[activ_i]['iou'] = activ_i_metrics_f[4].compute() # iou
-
-                        for activ_i, activ_i_metrics_list in activ_i_metrics.items():
-                            log_dict.update({
-                                f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["accuracy"][0].item(),
-                                f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["accuracy"][1].item(),
-                                f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["accuracy"][2].item(),
-                                f'Train AOI {activ_i} F-Score ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["fscore"][0].item(),
-                                f'Train AOI {activ_i} F-Score ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["fscore"][1].item(),
-                                f'Train AOI {activ_i} F-Score ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["fscore"][2].item(),
-                                f'Train AOI {activ_i} Precision ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["precision"][0].item(),
-                                f'Train AOI {activ_i} Precision ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["precision"][1].item(),
-                                f'Train AOI {activ_i} Precision ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["precision"][2].item(),
-                                f'Train AOI {activ_i} Recall ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["recall"][0].item(),
-                                f'Train AOI {activ_i} Recall ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["recall"][1].item(),
-                                f'Train AOI {activ_i} Recall ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["recall"][2].item(),
-                                f'Train AOI {activ_i} IoU ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["iou"][0].item(),
-                                f'Train AOI {activ_i} IoU ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["iou"][1].item(),
-                                f'Train AOI {activ_i} IoU ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["iou"][2].item(),
-                                f'Train AOI {activ_i} MeanIoU': activ_i_metrics_list["iou"][:3].mean() * 100
-                            })
-
-                    wandb.log(log_dict)
-
                 pbar.update(1)
 
         if index % configs['train_save_checkpoint_freq'] == 0:
@@ -294,6 +216,84 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
         total_train_prec = precision.compute()
         total_train_rec = recall.compute()
         total_train_iou = iou.compute()
+
+        if configs['on_screen_prints'] and (index % configs['print_frequency'] == 0):
+            print(f'Epoch: {epoch}')
+            print(f'Iteration: {index}')
+            print(f'Train Loss: {loss_val}')
+            print(f'Train Accuracy ({CLASS_LABELS[0]}): {100 * total_train_accuracy[0].item()}')
+            print(f'Train Accuracy ({CLASS_LABELS[1]}): {100 * total_train_accuracy[1].item()}')
+            print(f'Train Accuracy ({CLASS_LABELS[2]}): {100 * total_train_accuracy[2].item()}')
+            print(f'Train F-Score ({CLASS_LABELS[0]}): {100 * total_train_fscore[0].item()}')
+            print(f'Train F-Score ({CLASS_LABELS[1]}): {100 * total_train_fscore[1].item()}')
+            print(f'Train F-Score ({CLASS_LABELS[2]}): {100 * total_train_fscore[2].item()}')
+            print(f'Train Precision ({CLASS_LABELS[0]}): {100 * total_train_prec[0].item()}')
+            print(f'Train Precision ({CLASS_LABELS[1]}): {100 * total_train_prec[1].item()}')
+            print(f'Train Precision ({CLASS_LABELS[2]}): {100 * total_train_prec[2].item()}')
+            print(f'Train Recall ({CLASS_LABELS[0]}): {100 * total_train_rec[0].item()}')
+            print(f'Train Recall ({CLASS_LABELS[1]}): {100 * total_train_rec[1].item()}')
+            print(f'Train Recall ({CLASS_LABELS[2]}): {100 * total_train_rec[2].item()}')
+            print(f'Train IoU ({CLASS_LABELS[0]}): {100 * total_train_iou[0].item()}')
+            print(f'Train IoU ({CLASS_LABELS[1]}): {100 * total_train_iou[1].item()}')
+            print(f'Train IoU ({CLASS_LABELS[2]}): {100 * total_train_iou[2].item()}')
+            print(f'Train MeanIoU: {mean_iou * 100}')
+            print(f'lr: {lr_scheduler.get_last_lr()[0]}')
+
+        elif configs['wandb_activate']:
+            log_dict = {
+                'Epoch': epoch,
+                'Iteration': index,
+                'Train Loss': loss_val,
+                f'Train Accuracy ({CLASS_LABELS[0]})': 100 * total_train_accuracy[0].item(),
+                f'Train Accuracy ({CLASS_LABELS[1]})': 100 * total_train_accuracy[1].item(),
+                f'Train Accuracy ({CLASS_LABELS[2]})': 100 * total_train_accuracy[2].item(),
+                f'Train F-Score ({CLASS_LABELS[0]})': 100 * total_train_fscore[0].item(),
+                f'Train F-Score ({CLASS_LABELS[1]})': 100 * total_train_fscore[1].item(),
+                f'Train F-Score ({CLASS_LABELS[2]})': 100 * total_train_fscore[2].item(),
+                f'Train Precision ({CLASS_LABELS[0]})': 100 * total_train_prec[0].item(),
+                f'Train Precision ({CLASS_LABELS[1]})': 100 * total_train_prec[1].item(),
+                f'Train Precision ({CLASS_LABELS[2]})': 100 * total_train_prec[2].item(),
+                f'Train Recall ({CLASS_LABELS[0]})': 100 * total_train_rec[0].item(),
+                f'Train Recall ({CLASS_LABELS[1]})': 100 * total_train_rec[1].item(),
+                f'Train Recall ({CLASS_LABELS[2]})': 100 * total_train_rec[2].item(),
+                f'Train IoU ({CLASS_LABELS[0]})': 100 * total_train_iou[0].item(),
+                f'Train IoU ({CLASS_LABELS[1]})': 100 * total_train_iou[1].item(),
+                f'Train IoU ({CLASS_LABELS[2]})': 100 * total_train_iou[2].item(),
+                'Train MeanIoU': mean_iou * 100,
+                'lr': lr_scheduler.get_last_lr()[0]
+            }
+
+            if configs['log_AOI_metrics']:
+                activ_i_metrics = {}
+                for activ_i, activ_i_metrics_f in activ_metrics.items():
+                    activ_i_metrics[activ_i] = {}
+                    activ_i_metrics[activ_i]['accuracy'] = activ_i_metrics_f[0].compute() # accuracy
+                    activ_i_metrics[activ_i]['fscore'] = activ_i_metrics_f[1].compute() # fscore
+                    activ_i_metrics[activ_i]['precision'] = activ_i_metrics_f[2].compute() # precision
+                    activ_i_metrics[activ_i]['recall'] = activ_i_metrics_f[3].compute() # recall
+                    activ_i_metrics[activ_i]['iou'] = activ_i_metrics_f[4].compute() # iou
+
+                for activ_i, activ_i_metrics_list in activ_i_metrics.items():
+                    log_dict.update({
+                        f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["accuracy"][0].item(),
+                        f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["accuracy"][1].item(),
+                        f'Train AOI {activ_i} Accuracy ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["accuracy"][2].item(),
+                        f'Train AOI {activ_i} F-Score ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["fscore"][0].item(),
+                        f'Train AOI {activ_i} F-Score ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["fscore"][1].item(),
+                        f'Train AOI {activ_i} F-Score ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["fscore"][2].item(),
+                        f'Train AOI {activ_i} Precision ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["precision"][0].item(),
+                        f'Train AOI {activ_i} Precision ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["precision"][1].item(),
+                        f'Train AOI {activ_i} Precision ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["precision"][2].item(),
+                        f'Train AOI {activ_i} Recall ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["recall"][0].item(),
+                        f'Train AOI {activ_i} Recall ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["recall"][1].item(),
+                        f'Train AOI {activ_i} Recall ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["recall"][2].item(),
+                        f'Train AOI {activ_i} IoU ({CLASS_LABELS[0]})': 100 * activ_i_metrics_list["iou"][0].item(),
+                        f'Train AOI {activ_i} IoU ({CLASS_LABELS[1]})': 100 * activ_i_metrics_list["iou"][1].item(),
+                        f'Train AOI {activ_i} IoU ({CLASS_LABELS[2]})': 100 * activ_i_metrics_list["iou"][2].item(),
+                        f'Train AOI {activ_i} MeanIoU': activ_i_metrics_list["iou"][:3].mean() * 100
+                    })
+
+            wandb.log(log_dict)
 
         # Update LR scheduler
         lr_scheduler.step()

@@ -337,6 +337,8 @@ def eval_change_detection(model, loader, settype, configs=None, model_configs=No
 
     criterion = create_loss(configs, mode='val')
 
+    model.to(configs['device'])
+
     total_iters = 0
     total_loss = 0.0
     model.eval()

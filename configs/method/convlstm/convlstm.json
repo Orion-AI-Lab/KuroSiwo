@@ -1,0 +1,9 @@
+{
+  "method": "convlstm",
+  "optimizer": "adam",
+  "momentum": 0.99,
+  "learning_rate": 1e-3,
+  "weight_decay": 0.0,
+  "betas":[0.9, 0.009],
+  "lr_schedule": null
+}

@@ -19,6 +19,10 @@ from training.segmentation_trainer import (
     eval_semantic_segmentation,
     train_semantic_segmentation,
 )
+from training.recurrent_trainer import (
+    eval_recurrent_segmentation,
+    train_recurrent_segmentation
+)
 from utilities.utilities import *
 
 
@@ -77,48 +81,82 @@ if __name__ == "__main__":
 
     # Begin Training
     if configs["task"] == "segmentation":
-        # Create model
-        model = initialize_segmentation_model(configs, model_configs)
-        if not configs["test"]:
-            train_semantic_segmentation(
+        if configs['method'] == 'convlstm':
+            if not configs['test']:
+                model = initialize_recurrent_model(configs, model_configs)
+
+                train_recurrent_segmentation(
+                    model,
+                    train_loader,
+                    val_loader,
+                    test_loader,
+                    configs=configs,
+                    model_configs=model_configs,
+                )
+
+            # Evaluate on Test Set
+            model = initialize_recurrent_model(configs, model_configs)
+
+            ckpt_path = Path(configs["checkpoint_path"]) / f'{rep_i}' / "best_segmentation.pt"
+
+            print(f"Loading model from: {ckpt_path}")
+            checkpoint = torch.load(ckpt_path, map_location=configs['device'])
+            model.load_state_dict(checkpoint["model_state_dict"])
+
+            test_acc, test_score, miou = eval_recurrent_segmentation(
                 model,
-                train_loader,
-                val_loader,
                 test_loader,
+                ckpt_path.parent,
+                settype="Test",
                 configs=configs,
                 model_configs=model_configs,
             )
+
+            # Print final results
+            print("Test Mean IOU: ", miou)
         else:
-            if configs["wandb_activate"]:
-                # Store wandb id to continue run
-
-                id = wandb.util.generate_id()
-                json.dump(
-                    {"run_id": id}, open(configs["checkpoint_path"] + "/id.json", "w")
+            # Create model
+            model = initialize_segmentation_model(configs, model_configs)
+            if not configs["test"]:
+                train_semantic_segmentation(
+                    model,
+                    train_loader,
+                    val_loader,
+                    test_loader,
+                    configs=configs,
+                    model_configs=model_configs,
                 )
-                wandb.init(
-                    project=configs["wandb_project"],
-                    entity=configs["wandb_entity"],
-                    config=configs,
-                    id=id,
-                    resume="allow",
-                )
-                wandb.watch(model, log_freq=20)
+            else:
+                if configs["wandb_activate"]:
+                    # Store wandb id to continue run
 
-        # Evaluate on Test Set
-        print(
-            "Loading model from: ",
-            configs["checkpoint_path"] + "/" + "best_segmentation.pt",
-        )
-        model = torch.load(configs["checkpoint_path"] + "/" + "best_segmentation.pt")
-        test_acc, test_score, miou = eval_semantic_segmentation(
-            model,
-            test_loader,
-            settype="Test",
-            configs=configs,
-            model_configs=model_configs,
-        )
-        print("Test Mean IOU: ", miou)
+                    id = wandb.util.generate_id()
+                    json.dump(
+                        {"run_id": id}, open(configs["checkpoint_path"] + "/id.json", "w")
+                    )
+                    wandb.init(
+                        project=configs["wandb_project"],
+                        entity=configs["wandb_entity"],
+                        config=configs,
+                        id=id,
+                        resume="allow",
+                    )
+                    wandb.watch(model, log_freq=20)
+
+            # Evaluate on Test Set
+            print(
+                "Loading model from: ",
+                configs["checkpoint_path"] + "/" + "best_segmentation.pt",
+            )
+            model = torch.load(configs["checkpoint_path"] + "/" + "best_segmentation.pt")
+            test_acc, test_score, miou = eval_semantic_segmentation(
+                model,
+                test_loader,
+                settype="Test",
+                configs=configs,
+                model_configs=model_configs,
+            )
+            print("Test Mean IOU: ", miou)
     elif configs["task"] == "mae":
         print("Initializing Self-Supervised learning training with configs:")
         pprint.pprint(configs)

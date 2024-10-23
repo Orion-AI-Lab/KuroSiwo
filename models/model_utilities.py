@@ -14,7 +14,8 @@ from .hfanet import HFANet
 from .siam_conc import SiamUnet_conc
 from .siam_diff import SiamUnet_diff
 import segmentation_models_pytorch as smp
-from .snunet import SNUNet_ECAM 
+from .snunet import SNUNet_ECAM
+from .convlstm import ConvLSTM
 import segmentation_models_pytorch as smp
 
 
@@ -164,6 +165,18 @@ def initialize_segmentation_model(config, model_configs):
             summary(model, input_size=((6, 224, 224)), device="cpu")
 
         return model
+
+
+def initialize_recurrent_model(configs, model_configs, phase="train"):
+    if configs['method'] == 'convlstm':
+        model = ConvLSTM(in_channels=configs['num_channels'], num_classes=configs['num_classes'], inp_size=224, device=configs['device'])
+
+    if configs["resume_checkpoint"]:
+        checkpoint = torch.load(configs["resume_checkpoint"])
+        model.load_state_dict(checkpoint["model_state_dict"])
+
+    print(model)
+    return model
 
 
 def initialize_cd_model(configs, model_configs, phase="train"):

@@ -23,7 +23,7 @@ batch_9_url="https://www.dropbox.com/scl/fi/sctg1ybqxtzz23018htwx/08.tar.gz?rlke
 batch_10_url="https://www.dropbox.com/scl/fi/425wrfqqc7sy8pbdnkgzw/09.tar.gz?rlkey=ziejzpo2ddgnygpbd1emn1nir&st=irjm2j98&dl=0"
 batch_11_url="https://www.dropbox.com/scl/fi/rwc2yvd0g070qicg300de/10.tar.gz?rlkey=12i17si2kzjpey4vgig9pjnv7&st=p2v45gue&dl=0"
 
-urls=($cat_url $batch_1_url $batch_2_url $batch_3_url $batch_4_url $batch_5_url $batch_6_url $batch_7_url $batch_8_url $batch_9_url $batch_10_url)
+urls=($cat_url $batch_1_url $batch_2_url $batch_3_url $batch_4_url $batch_5_url $batch_6_url $batch_7_url $batch_8_url $batch_9_url $batch_10_url $batch_11_url)
 
 downloaded_files=()
 failed_downloads=()

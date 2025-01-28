@@ -468,12 +468,13 @@ def create_parser():
             return
 
         grid_dict = {}
-
+        invalid_number = 0
         for i, id in enumerate(fcat.ids):
             print(f"Grid {i+1}/{len(cat)}: {id}")
             gridd = fcat.grid(id)
             if not gridd.valid:
                 print(f"Invalid Grid: {id}")
+                invalid_number += 1
                 continue
             if "999999" in str(gridd.path):
                 continue
@@ -498,7 +499,8 @@ def create_parser():
                 "clz": gridd.clz_id,
                 "clz_name": gridd.clz_name,
             }
-
+        print('Num of invalid grids: ', invalid_number)
+        print('Num of valid grids: ', len(grid_dict))
         pickle_path = CFG["PICKLE_PATH"]
 
         Path(os.path.dirname(pickle_path)).mkdir(parents=True, exist_ok=True)

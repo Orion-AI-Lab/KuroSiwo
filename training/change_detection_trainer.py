@@ -2,6 +2,7 @@ import torch
 from tqdm import tqdm
 from pathlib import Path
 import json
+import pyjson5
 import wandb
 import kornia
 
@@ -20,13 +21,13 @@ def train_change_detection(model, train_loader, val_loader, test_loader, configs
 
     if configs['wandb_activate']:
         if configs['resume_wandb']:
-            id = json.load(open(f'{configs["checkpoint_path"]}/id.json', 'r'))['run_id']
+            wid = json.load(open(f'{configs["checkpoint_path"]}/id.json', 'r'))['run_id']
         else:
             # Store wandb id to continue run
-            id = wandb.util.generate_id()
-            json.dump({'run_id': id}, open(configs['checkpoint_path'] + '/id.json', 'w'))
+            wid = wandb.util.generate_id()
+            pyjson5.dump({'run_id': str(wid)}, open(configs['checkpoint_path'] + '/id.json', 'wb'), quote_keys=True)
 
-        wandb.init(project=configs['wandb_project'], entity=configs['wandb_entity'], config=configs, id=id, resume="allow")
+        wandb.init(project=configs['wandb_project'], entity=configs['wandb_entity'], config=configs, id=wid, resume="allow")
         wandb.watch(model, log_freq=20)
 
     # Initialize metrics

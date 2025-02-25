@@ -375,7 +375,7 @@ def update_config(config, args=None):
         config.update(augmentation_config)
 
     # Compute total number of input channels
-    if config['task'] == 'cd':
+    if (config['task'] == 'cd') or (config['method'] == 'convlstm'):
         config['num_channels'] = len(config['channels'])
         if config['dem']:
             config['num_channels'] += 1

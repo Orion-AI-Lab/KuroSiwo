@@ -356,11 +356,9 @@ def update_config(config, args=None):
     if args is not None:
         if args.inputs is not None:
             config["inputs"] = args.inputs
-        if args.dem is not None:
-            args.dem = bool(args.dem)
+        if args.dem:
             config["dem"] = args.dem
             if args.slope:
-                args.slope = bool(args.slope)
                 config["slope"] = args.slope
 
     # Load train related configs

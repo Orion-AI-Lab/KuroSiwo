@@ -97,7 +97,7 @@ if __name__ == "__main__":
             # Evaluate on Test Set
             model = initialize_recurrent_model(configs, model_configs)
 
-            ckpt_path = Path(configs["checkpoint_path"]) / f'{rep_i}' / "best_segmentation.pt"
+            ckpt_path = Path(configs["checkpoint_path"]) / "best_segmentation.pt"
 
             print(f"Loading model from: {ckpt_path}")
             checkpoint = torch.load(ckpt_path, map_location=configs['device'])

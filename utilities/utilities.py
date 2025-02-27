@@ -124,14 +124,10 @@ def prepare_loaders(configs):
 def reverse_scale_img(img, x1, x2, configs):
     if configs["scale_input"] == "normalize":
         # x1 is the means, x2 the stds
-        new_means = -(x1 / x2)
-        new_stds = 1 / x2
         if img.ndim == 4:
-            return Normalize(new_means[:, :, None, None], new_stds[:, :, None, None])(
-                img
-            )
+            return (img * x2[:, :, None, None]) + x1[:, :, None, None]
         else:
-            return Normalize(new_means[:, None, None], new_stds[:, None, None])(img)
+            return (img * x2[:, None, None]) + x1[:, None, None]
     elif configs["scale_input"] in ["min-max", "custom"]:
         # x1 is the mins, x2 is the maxs
         if len(configs["channels"]) == 2:

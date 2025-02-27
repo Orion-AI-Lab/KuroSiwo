@@ -402,9 +402,9 @@ def eval_recurrent_segmentation(model, loader, ckpt_path, settype, configs=None,
                         prediction_wand = predictions[0].detach().cpu()
 
                         if configs['scale_input'] is not None:
-                            post_image_scale_vars = [post_scale_var_1[0][0], post_scale_var_2[0][0]]
-                            pre1_scale_vars = [pre1_scale_var_1[0][0], pre1_scale_var_2[0][0]]
-                            pre2_scale_vars = [pre2_scale_var_1[0][0], pre2_scale_var_2[0][0]]
+                            post_image_scale_vars = [torch.stack((post_scale_var_1[0][0], post_scale_var_1[1][0])), torch.stack((post_scale_var_2[0][0], post_scale_var_2[1][0]))]
+                            pre1_scale_vars = [torch.stack((pre1_scale_var_1[0][0], pre1_scale_var_1[1][0])), torch.stack((pre1_scale_var_2[0][0], pre1_scale_var_2[1][0]))]
+                            pre2_scale_vars = [torch.stack((pre2_scale_var_1[0][0], pre2_scale_var_1[1][0])), torch.stack((pre2_scale_var_2[0][0], pre2_scale_var_2[1][0]))]
 
                     if configs['log_zone_metrics']:
                         clz_in_batch = torch.unique(clz)

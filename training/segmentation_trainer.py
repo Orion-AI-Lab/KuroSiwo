@@ -419,9 +419,9 @@ def eval_semantic_segmentation(
                     first_prediction = predictions.detach().cpu()[0]
 
                     if configs["scale_input"] is not None:
-                        image_scale_vars = [image_scale_var_1[0], image_scale_var_2[0]]
-                        pre_scale_vars = [pre_scale_var_1[0], pre_scale_var_2[0]]
-                        pre2_scale_vars = [pre2_scale_var_1[0], pre2_scale_var_2[0]]
+                        post_image_scale_vars = [torch.stack((post_scale_var_1[0][0], post_scale_var_1[1][0])), torch.stack((post_scale_var_2[0][0], post_scale_var_2[1][0]))]
+                        pre_scale_vars = [torch.stack((pre1_scale_var_1[0][0], pre1_scale_var_1[1][0])), torch.stack((pre1_scale_var_2[0][0], pre1_scale_var_2[1][0]))]
+                        image_scale_vars = [torch.stack((pre2_scale_var_1[0][0], pre2_scale_var_1[1][0])), torch.stack((pre2_scale_var_2[0][0], pre2_scale_var_2[1][0]))]
 
                 accuracy(predictions, mask)
                 fscore(predictions, mask)

@@ -1,9 +1,9 @@
 {
   "track": "RandomEvents",
-  "train_pickle": "pickle/KuroV2_grid_dict.pkl",  // The pickle containing the GRD training data
-  "test_pickle": "pickle/KuroV2_grid_dict_test_0_100.pkl",  // The pickle containing the GRD testing data
-  "negative_pickle":"pickle/negatives_only.pkl",  // Pickle containing only negatives (optional)
-  "slc": true,  // 'true' in order to use SLC data instead of GRD
+  "train_pickle": "pickle/KuroV2_grid_dict.gz",  // The pickle containing the GRD training data
+  "test_pickle": "pickle/KuroV2_grid_dict_test_0_100.gz",  // The pickle containing the GRD testing data
+  "negative_pickle":null,  // Pickle containing only negatives (Optional. Used for oversampling)
+  "slc": false,  // 'true' in order to use SLC data instead of GRD
   "train_json": "json/slc_grid_pwater_0.0001.json", // The JSON containing the SLC training data
   "test_json": "json/slc_grid_pwater_0.json",  // The JSON containing the SLC testing data
   "slc_root_path": "",  // The path containing the SLC data

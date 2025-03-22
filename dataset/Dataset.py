@@ -40,6 +40,7 @@ class Dataset(torch.utils.data.Dataset):
         self.mode = mode
         self.configs = configs
         self.root_path = os.path.join(self.configs["root_path"], "data")
+        
         if (
             self.configs["task"] == "self-supervised"
             or self.configs["data_augmentations"]
@@ -546,7 +547,7 @@ class Dataset(torch.utils.data.Dataset):
                     elif file.stem.startswith("SL2_IVH"):
                         # Get sl2 vh channel
                         sec2_vh = cv.imread(str(file), cv.IMREAD_ANYDEPTH)
-
+            
             invalid_mask = valid_mask != 1
 
             # Mask images with valid pixels
@@ -1152,8 +1153,8 @@ class SLCDataset(torch.utils.data.Dataset):
                     if self.configs['dem'] and not self.configs['slope']:
                         if self.configs["scale_input"] is not None:
                             normalization = transforms.Normalize(
-                                mean=self.configs["dem_mean"],
-                                std=self.configs["dem_std"],
+                                mean=self.configs["slc_dem_mean"],
+                                std=self.configs["slc_dem_std"],
                             )
                             dem = normalization(torch.from_numpy(dem))
                     elif self.configs['dem'] and self.configs['slope']:
@@ -1166,8 +1167,8 @@ class SLCDataset(torch.utils.data.Dataset):
                         if self.configs["scale_input"] is not None:
                             # Only support standarization for DEMs
                             normalization = transforms.Normalize(
-                                mean=self.configs["slope_mean"],
-                                std=self.configs["slope_std"],
+                                mean=self.configs["slc_slope_mean"],
+                                std=self.configs["slc_slope_std"],
                             )
                             dem = normalization(torch.from_numpy(dem))
         try:

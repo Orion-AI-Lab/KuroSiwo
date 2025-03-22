@@ -412,20 +412,10 @@ def update_config(config, args=None):
     return config
 
 
-def define_tracks(configs):
-    if configs["track"] == "RandomEvents":
-        train_acts = [
-            130, 470, 555, 118, 174, 324, 421, 554, 427, 518, 502,
-            498, 497, 496, 492, 147, 267, 273, 275, 417, 567,
-            1111011, 1111004, 1111009, 1111010, 1111006, 1111005
-        ]
-        val_acts = [514, 559, 279, 520, 437, 1111003, 1111008]
-        test_acts = [321, 561, 445, 562, 411, 1111002, 277, 1111007, 205, 1111013]
-
-    configs["train_acts"] = train_acts
-    configs["val_acts"] = val_acts
-    configs["test_acts"] = test_acts
-
+def define_tracks(configs):        
+    train_acts = configs['train_acts']
+    val_acts = configs['val_acts']
+    test_acts = configs['test_acts']
     print("train activations ", len(train_acts))
     print("val activations ", len(val_acts))
     print("test activations ", len(test_acts))

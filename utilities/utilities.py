@@ -84,9 +84,14 @@ def prepare_loaders(configs):
     print("Initializing ", configs["track"])
     print("=" * 20)
 
-    train_dataset = Dataset.Dataset(mode="train", configs=configs)
-    val_dataset = Dataset.Dataset(mode="val", configs=configs)
-    test_dataset = Dataset.Dataset(mode="test", configs=configs)
+    if "slc" in configs and configs["slc"]:
+        train_dataset = Dataset.SLCDataset(mode="train", configs=configs)
+        val_dataset = Dataset.SLCDataset(mode="val", configs=configs)
+        test_dataset = Dataset.SLCDataset(mode="test", configs=configs)
+    else:
+        train_dataset = Dataset.Dataset(mode="train", configs=configs)
+        val_dataset = Dataset.Dataset(mode="val", configs=configs)
+        test_dataset = Dataset.Dataset(mode="test", configs=configs)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
@@ -351,11 +356,9 @@ def update_config(config, args=None):
     if args is not None:
         if args.inputs is not None:
             config["inputs"] = args.inputs
-        if args.dem is not None:
-            args.dem = bool(args.dem)
+        if args.dem:
             config["dem"] = args.dem
             if args.slope:
-                args.slope = bool(args.slope)
                 config["slope"] = args.slope
 
     # Load train related configs
@@ -380,6 +383,12 @@ def update_config(config, args=None):
         if config['dem']:
             config['num_channels'] += 1
 
+    if "slc" in config and config["slc"]:
+        if config['dem']:
+            config["num_channels"] = ((config["num_channels"] - 1) * 2) + 1
+        else:
+            config["num_channels"] = config["num_channels"]*2
+
     if config["weighted"] and config["track"] == "RandomEvents":
         config["class_weights"] = [
             0.3715753140309927,
@@ -403,19 +412,10 @@ def update_config(config, args=None):
     return config
 
 
-def define_tracks(configs):
-    if configs["track"] == "RandomEvents":
-        train_acts = [
-            130, 470, 205, 555, 118, 174, 324, 421, 554, 427, 518, 502,
-            498, 497, 496, 492, 147, 267, 273, 275, 417, 567
-        ]
-        val_acts = [514, 559, 279, 520, 437]
-        test_acts = [321, 561, 445, 562, 411, 277]
-
-    configs["train_acts"] = train_acts
-    configs["val_acts"] = val_acts
-    configs["test_acts"] = test_acts
-
+def define_tracks(configs):        
+    train_acts = configs['train_acts']
+    val_acts = configs['val_acts']
+    test_acts = configs['test_acts']
     print("train activations ", len(train_acts))
     print("val activations ", len(val_acts))
     print("test activations ", len(test_acts))

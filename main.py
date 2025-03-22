@@ -29,8 +29,8 @@ from utilities.utilities import *
 parser = argparse.ArgumentParser()
 parser.add_argument("--method", default=None)
 parser.add_argument("--backbone", default=None)
-parser.add_argument("--dem", type=int, default=None)
-parser.add_argument("--slope", type=int, default=None)
+parser.add_argument("--dem", action='store_true', default=False)
+parser.add_argument("--slope", action='store_true', default=False)
 parser.add_argument("--batch_size", default=None)
 parser.add_argument("--inputs", nargs="+", default=None)
 parser.add_argument("--seed", type=int, default=999)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     configs.update(model_configs)
 
-    if args.inputs is None and args.dem is None:
+    if args.inputs is None and args.dem:
         configs = update_config(configs, None)
     else:
         configs = update_config(configs, args)

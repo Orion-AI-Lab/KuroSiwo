@@ -1,5 +1,5 @@
 import os
-import pickle
+from compress_pickle import load, dump
 import random
 from pathlib import Path
 
@@ -16,6 +16,8 @@ import torchvision
 from torchio.transforms import RescaleIntensity
 from torchvision import transforms
 from tqdm import tqdm
+from datetime import datetime
+import pyjson5 as json
 
 import utilities.utilities as utilities
 from utilities import augmentations
@@ -26,7 +28,7 @@ def get_grids(pickle_path):
         print("Pickle file not found! ", pickle_path)
         exit(2)
     with open(pickle_path, "rb") as file:
-        grid_dict = pickle.load(file)
+        grid_dict = load(file)
     return grid_dict
 
 
@@ -38,6 +40,7 @@ class Dataset(torch.utils.data.Dataset):
         self.mode = mode
         self.configs = configs
         self.root_path = os.path.join(self.configs["root_path"], "data")
+        
         if (
             self.configs["task"] == "self-supervised"
             or self.configs["data_augmentations"]
@@ -483,7 +486,7 @@ class Dataset(torch.utils.data.Dataset):
     def update_min_max_stats(self):
         if Path("stats.pkl").exists():
             print(f"({self.mode}) Using precalculated stats for dataset...")
-            return pickle.load(open("stats.pkl", "rb"))
+            return load(open("stats.pkl", "rb"))
 
         print(f"({self.mode}) Calculating stats for dataset...")
 
@@ -544,7 +547,7 @@ class Dataset(torch.utils.data.Dataset):
                     elif file.stem.startswith("SL2_IVH"):
                         # Get sl2 vh channel
                         sec2_vh = cv.imread(str(file), cv.IMREAD_ANYDEPTH)
-
+            
             invalid_mask = valid_mask != 1
 
             # Mask images with valid pixels
@@ -631,7 +634,7 @@ class Dataset(torch.utils.data.Dataset):
         print(f"({self.mode}) New stats:")
         print(min_max_random_events)
 
-        pickle.dump(min_max_random_events, open("stats.pkl", "wb"))
+        dump(min_max_random_events, open("stats.pkl", "wb"))
 
         return min_max_random_events
 
@@ -890,10 +893,10 @@ class SSLDataset(torch.utils.data.Dataset):
                             else:
                                 self.samples.append(hash_folder_dir)
             with open("ssl_samples.pkl", "wb") as file:
-                pickle.dump(self.samples, file)
+                dump(self.samples, file)
         else:
             with open("ssl_samples.pkl", "rb") as file:
-                self.samples = pickle.load(file)
+                self.samples = load(file)
         random.Random(999).shuffle(self.samples)
         self.num_examples = len(self.samples)
 
@@ -978,6 +981,251 @@ class SSLDataset(torch.utils.data.Dataset):
         image = einops.rearrange(image, "h w c -> c h w")
         image = torch.from_numpy(image)
         return image, flood, pre_event_1, pre_event_2
+
+
+class SLCDataset(torch.utils.data.Dataset):
+    def __init__(self, mode="train", configs=None):
+        print('='*20)
+        print('Initializing SLC Dataset')
+        print('='*20)
+        self.train_acts = configs["train_acts"]
+        self.val_acts = configs["val_acts"]
+        self.test_acts = configs["test_acts"]
+        self.mode = mode
+        self.configs = configs
+        self.root_path = os.path.join(self.configs["slc_root_path"])
+        if self.configs["task"] == "self-supervised" or self.configs["data_augmentations"]:
+            self.augmentations = augmentations.get_augmentations(self.configs)
+        else:
+            self.augmentations = None
+
+        self.non_valids = []
+
+        # Load precomputed min-max stats for each SAR image or calculate them anew
+        # self.min_max_random_events = self.update_min_max_stats()
+        self.clz_stats = {1: 0, 2: 0, 3: 0}
+        self.act_stats = {}
+        if self.mode == "train":
+            self.valid_acts = self.train_acts
+            self.pickle_path = configs["train_json"]
+        elif self.mode == "val":
+            self.valid_acts = self.val_acts
+            self.pickle_path = configs["test_json"]
+        else:
+            self.valid_acts = self.test_acts
+            self.pickle_path = configs["test_json"]
+
+        self.negative_grids = None
+        total_grids = {}
+        self.positive_records = []
+        self.negative_records = []
+
+        self.grids = json.load(open(self.pickle_path, "r"))  # get_grids(pickle_path=self.pickle_path)
+        total_grids = self.grids
+
+        all_activations = []
+        all_activations.extend(self.train_acts)
+        all_activations.extend(self.val_acts)
+        all_activations.extend(self.test_acts)
+        self.records = []
+        for key in total_grids:
+            record = {}
+            record["id"] = key
+            record["path"] = total_grids[key]["path"]
+
+            record["type"] = None
+            record["clz"] = total_grids[key]["clz"]
+            activation = total_grids[key]["actid"]
+            aoi = total_grids[key]["aoiid"]
+            if configs["track"] == "Climatic":
+                act_aoi = str(activation) + "_" + f"{aoi:02}"
+            else:
+                act_aoi = activation
+
+            record["activation"] = activation
+            if act_aoi in self.valid_acts:
+                self.clz_stats[record["clz"]] += 1
+                if act_aoi in self.act_stats:
+                    self.act_stats[act_aoi] += 1
+                else:
+                    self.act_stats[act_aoi] = 1
+                if self.configs["task"] == "diffusion-unsup":
+                    # We will create a separate record per observation (pre1, pre2, flood) in order to
+                    # ensure that the model will see every image during an epoch
+                    # This will also allow us to compute appropriate weights for the loss functions
+                    for t in ["pre1", "pre2", "flood"]:
+                        tmp = record.copy()
+                        tmp["type"] = t
+                        self.records.append(tmp)
+                        if key in self.grids:
+                            self.positive_records.append(tmp)
+                        else:
+                            self.negative_records.append(tmp)
+                else:
+                    self.records.append(record)
+                    if key in self.grids:
+                        self.positive_records.append(record)
+                    else:
+                        self.negative_records.append(record)
+
+            if act_aoi not in all_activations and act_aoi not in self.non_valids:
+                print("Activation: ", activation, " not in Activations")
+                self.non_valids.append(act_aoi)
+
+        print("Samples per Climatic zone for mode: ", self.mode)
+        print(self.clz_stats)
+        print("Samples per Activation for mode: ", self.mode)
+        print(self.act_stats)
+        self.num_examples = len(self.records)
+        self.activations = set([record["activation"] for record in self.records])
+
+    def __len__(self):
+        return self.num_examples
+
+    def normalize(self, image):
+        means = self.configs["slc_mean"]
+        stds = self.configs["slc_std"]
+
+        return means, stds, torchvision.transforms.Normalize(means, stds)(image)
+
+    def __getitem__(self, idx):
+        sample = self.records[idx]
+
+        path = os.path.join(sample["path"])
+        path = os.path.join(self.root_path, path)
+        files = os.listdir(path)
+        clz = sample["clz"]
+        activation = sample["activation"]
+        mask = None
+
+        for file in files:
+            current_path = str(os.path.join(path, file))
+            if "xml" not in file:
+                if file.startswith("MK0_MLU") and (sample["type"] is None):
+                    # Get mask of flooded/perm water pixels
+                    mask = cv.imread(current_path, cv.IMREAD_ANYDEPTH)
+                elif file.startswith("MK0_MNA") and (sample["type"] is None):
+                    # Get mask of valid pixels
+                    valid_mask = cv.imread(current_path, cv.IMREAD_ANYDEPTH)
+                elif file.startswith("MS1"):
+                    # Get master ivv channel
+                    flood = rio.open_rasterio(current_path).to_numpy()  # cv.imread(current_path, cv.IMREAD_ANYDEPTH)
+                    if self.configs["uint8"]:
+                        flood /= flood.max()
+                        flood *= 255
+                        flood = flood.astype(np.uint8)
+                    if flood is None:
+                        print(current_path)
+
+                elif file.startswith("SL1"):
+                    # Get slave1 vv channel
+                    sec1 = rio.open_rasterio(current_path).to_numpy()
+                    if self.configs["uint8"]:
+                        sec1 /= sec1.max()
+                        sec1 *= 255
+                        sec1 = sec1.astype(np.uint8)
+
+                elif file.startswith("SL2") and (sample["type"] not in ["flood", "pre1"]):
+                    # Get sl2 vv channel
+                    sec2 = rio.open_rasterio(current_path).to_numpy()
+                    if self.configs["uint8"]:
+                        sec2 /= sec2.max()
+                        sec2 *= 255
+                        sec2 = sec2.astype(np.uint8)
+                elif file.startswith("MK0_DEM"):
+                    # Get DEM
+                    dem = rio.open_rasterio(current_path)
+
+                    # NOTE: Nodata values are not NaN but a rather high float number
+                    # Here we convert the nodata value to NaN and interpolate
+                    nodata = dem.rio.nodata
+                    dem_arr = dem.to_numpy()
+                    nans = dem == nodata
+                    if nans.any().item():
+                        dem_arr[nans] = np.nan
+                        dem[:] = dem_arr
+
+                    dem = dem.rio.write_nodata(np.nan)
+                    dem = dem.rio.interpolate_na()
+
+                    dem = dem.to_numpy()
+
+                    if self.configs['dem'] and not self.configs['slope']:
+                        if self.configs["scale_input"] is not None:
+                            normalization = transforms.Normalize(
+                                mean=self.configs["slc_dem_mean"],
+                                std=self.configs["slc_dem_std"],
+                            )
+                            dem = normalization(torch.from_numpy(dem))
+                    elif self.configs['dem'] and self.configs['slope']:
+                        # Get slope
+                        rd_dem = rd.rdarray(dem.squeeze(), no_data=nodata)
+                        slope = rd.TerrainAttribute(rd_dem, attrib="slope_riserun")
+                        slope = np.asarray(slope.data)
+                        dem = einops.rearrange(slope, "h w -> 1 h w")
+
+                        if self.configs["scale_input"] is not None:
+                            # Only support standarization for DEMs
+                            normalization = transforms.Normalize(
+                                mean=self.configs["slc_slope_mean"],
+                                std=self.configs["slc_slope_std"],
+                            )
+                            dem = normalization(torch.from_numpy(dem))
+        try:
+            if flood.shape!= (4,224,224) or sec1.shape!= (4,224,224) or sec2.shape!= (4,224,224):
+                #pad using albumentations
+                pad = A.Compose([A.PadIfNeeded(
+                    min_height=224,  # Optional[int]
+                    min_width=224,  # Optional[int]
+                    border_mode=cv.BORDER_CONSTANT,  # int
+                    value=int(flood.mean()),  # Union[float, Sequence[float], NoneType]
+                    mask_value=3,  # Union[float, Sequence[float], NoneType]
+                    p=1.0,  # float
+                )])
+                flood = einops.rearrange(flood,"c h w -> h w c")
+                sec1 = einops.rearrange(sec1,"c h w -> h w c")
+                sec2 = einops.rearrange(sec2,"c h w -> h w c")
+
+                try:
+                    transform = pad(image=flood,mask=mask)
+                except Exception as e:
+                    print(e)
+                    print(sample['path'])
+                    print(flood.shape,sec1.shape,sec2.shape,mask.shape,flush=True)
+                    exit(2)
+
+                flood = transform["image"]
+
+                mask = transform["mask"]
+
+                transform = pad(image=sec1)
+                sec1 = transform["image"]
+                transform = pad(image=sec2)
+                sec2 = transform["image"]
+                flood = einops.rearrange(flood,"h w c -> c h w")
+                sec1 = einops.rearrange(sec1,"h w c -> c h w")
+                sec2 = einops.rearrange(sec2,"h w c -> c h w")
+        except:
+            print(sample['path'])
+
+        if self.configs['scale_input'] == "normalize":
+            flood = torch.from_numpy(flood).float()
+            sec1 = torch.from_numpy(sec1).float()
+            sec2 = torch.from_numpy(sec2).float()
+            mask = torch.from_numpy(mask).long()
+            sc_mean, scale_stdf , flood = self.normalize(flood)
+            sc1, sc_std1 , sec1 = self.normalize(sec1)
+            sc2, sc_std2, sec2 = self.normalize(sec2)
+
+            if not self.configs["dem"]:
+                return sc_mean, scale_stdf, flood, mask, sc1, sc_std1, sec1, sc2, sc_std2, sec2, clz, activation
+            else:
+                return sc_mean, scale_stdf, flood, mask, sc1, sc_std1, sec1, sc2, sc_std2, sec2, dem, clz, activation
+        else:
+            if not self.configs["dem"]:
+                return flood, mask, sec1, sec2, clz, activation
+            else:
+                return flood, mask, sec1, sec2, dem, clz, activation
 
 
 if __name__ == "__main__":

@@ -1,22 +1,41 @@
 {
   "track": "RandomEvents",
-  "train_pickle": "pickle/grid_dict.pkl",
-  "test_pickle": "pickle/grid_dict.pkl",
-  "negative_pickle":"pickle/negatives_only.pkl",
-  "inputs": ["pre_event_1","pre_event_2", "post_event"],
+  "train_pickle": "pickle/KuroV2_grid_dict.gz",  // The pickle containing the GRD training data
+  "test_pickle": "pickle/KuroV2_grid_dict_test_0_100.gz",  // The pickle containing the GRD testing data
+  "negative_pickle":null,  // Pickle containing only negatives (Optional. Used for oversampling)
+  "slc": false,  // 'true' in order to use SLC data instead of GRD
+  "train_json": "json/slc_grid_pwater_0.0001.json", // The JSON containing the SLC training data
+  "test_json": "json/slc_grid_pwater_0.json",  // The JSON containing the SLC testing data
+  "slc_root_path": "",  // The path containing the SLC data
+  "inputs": ["pre_event_1", "pre_event_2", "post_event"],
   "channels": [ "vv","vh"],
   "water_percentage": "[0,100]",
-  "data_augmentations":false,
+  "data_augmentations": false,
   "clamp_input": 0.15,
   "scale_input": "normalize",
   "data_mean": [0.0953, 0.0264],
   "data_std": [0.0427, 0.0215],
-  "dem_mean":67.0293,
-  "dem_std":1765.0062,
-  "dem":false,
-  "slope":false,
-  "slope_mean":2.9482,
-  "slope_std":79.2493,
-  "reverse_scaling":false,
-  "uint8":false
+  "dem_mean":93.4313,
+  "dem_std":1410.8382,
+  "slc_dem_mean": 82.96274925580951,
+  "slc_dem_std":153.71243439980663,
+  "slc_mean":[2.2367e-02, 3.9242e+01, 8.1130e+01, 4.3526e-02],
+  "slc_std":[ 1.2843, 25.6152, 58.0151,  1.2844],
+  "dem":true,
+  "slope":true,
+  "slope_mean":2.1277,
+  "slope_std":67.5048,
+  "slc_slope_mean":0.3977,
+  "slc_slope_std":0.4946,
+  "dem": false,
+  "slope": false,
+  "reverse_scaling": false,
+  "uint8": false,
+  "train_acts": [
+            130, 470, 555, 118, 174, 324, 421, 554, 427, 518, 502,
+            498, 497, 496, 492, 147, 267, 273, 275, 417, 567,
+            1111011, 1111004, 1111009, 1111010, 1111006, 1111005
+        ],
+  "val_acts": [514, 559, 279, 520, 437, 1111003, 1111008],
+  "test_acts" : [321, 561, 445, 562, 411, 1111002, 277, 1111007, 205, 1111013]
 }

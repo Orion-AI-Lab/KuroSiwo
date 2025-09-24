@@ -15,6 +15,7 @@
 - [Repository structure](#kuro-siwo-repo-structure)
 - [Pretrained models](#pretrained-models)
 - [Citation](#citation)
+- [License](#license)
 
 
 ### Download Kuro Siwo
@@ -81,3 +82,5 @@ If you use this work please cite:
  year = {2024}
 }
 ```
+### License
+The Kuro Siwo dataset is released under the CC BY license.

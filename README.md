@@ -36,7 +36,11 @@
 #### SLC Data
   - The SLC Preprocessed products can be downloaded from the following [link](https://www.dropbox.com/scl/fo/kknf6ycz6ywffopjxroys/AOIedl2NgWnOXQBEDUGv4m0?rlkey=rb18w8rzpwitg2w3nlhzklnyy&st=p1vv516h&dl=0).
 
-  - Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).  
+  - Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).
+
+
+#### Polygons
+If you are interested in the annotation polygons of Kuro Siwo, you can download them from [this repository](https://github.com/Orion-AI-Lab/KuroSiwo-annotations/tree/main). 
 
 
 ### Data preprocessing

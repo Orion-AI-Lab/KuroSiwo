@@ -2,7 +2,8 @@
 
   #### Latest updates:
     - [✔️] Update codebase for KuroSiwo v2 + updated mean/stds
-    - [✔️] Updated citation 
+    - [✔️] Updated citation
+    - [✔️] Uploaded annotation polygons
     - [ ] TODO: Expand README with more elaborate guidelines
     - [ ] TODO: Upload Kuro-Siwo to HuggingFace
 

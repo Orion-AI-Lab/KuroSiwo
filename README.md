@@ -4,6 +4,7 @@
     - [✔️] Update codebase for KuroSiwo v2 + updated mean/stds
     - [✔️] Updated citation
     - [✔️] Uploaded annotation polygons
+    - [✔️] Uploaded webdatasets to Hugging Face
     - [ ] TODO: Expand README with more elaborate guidelines
     - [ ] TODO: Upload Kuro-Siwo to HuggingFace
 
@@ -38,6 +39,9 @@
   - The SLC Preprocessed products can be downloaded from the following [link](https://www.dropbox.com/scl/fo/kknf6ycz6ywffopjxroys/AOIedl2NgWnOXQBEDUGv4m0?rlkey=rb18w8rzpwitg2w3nlhzklnyy&st=p1vv516h&dl=0).
 
   - Similarly, the cropped SLC patches (224x224 pixels) can be acquired from the following [link](https://www.dropbox.com/scl/fo/6u1bhbhd34rnn0u47o8dj/AK9vblAzDWqhPTqYvioPUb8?rlkey=i7k862563n936akuqlsdf3w66&st=0f7q3vno&dl=0).
+
+#### Webdatasets
+The webdatasets for BlackBench can be downloaded through [Hugging Face](https://huggingface.co/datasets/orion-ai-lab/Kuro-Siwo-Webdataset).
 
 
 #### Polygons

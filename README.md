@@ -5,8 +5,7 @@
     - [✔️] Updated citation
     - [✔️] Uploaded annotation polygons
     - [✔️] Uploaded webdatasets to Hugging Face
-    - [ ] TODO: Expand README with more elaborate guidelines
-    - [ ] TODO: Upload Kuro-Siwo to HuggingFace
+    - [✔️] Uploaded GeoTIFFs to HuggingFace
 
 ![Kuro Siwo](imgs/kuro_spatial.png)
 
@@ -43,6 +42,8 @@
 #### Webdatasets
 The webdatasets for BlackBench can be downloaded through [Hugging Face](https://huggingface.co/datasets/orion-ai-lab/Kuro-Siwo-Webdataset).
 
+#### GeoTIFFs
+We also provide the original GeoTIFF images of Kuro Siwo through [Hugging Face](https://huggingface.co/datasets/orion-ai-lab/Kuro-Siwo-GeoTIFFs).
 
 #### Polygons
 If you are interested in the annotation polygons of Kuro Siwo, you can download them from [this repository](https://github.com/Orion-AI-Lab/KuroSiwo-annotations/tree/main). 
